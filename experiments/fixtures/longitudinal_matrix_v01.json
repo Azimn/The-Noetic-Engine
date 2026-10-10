@@ -1,0 +1,163 @@
+{
+  "schema": "noetic-longitudinal-matrix-v01",
+  "evidence_status": "synthetic, assistant-authored, openly inspected, not independently reviewed",
+  "note": "Actions have no independently adjudicated correct label. This suite measures causal sensitivity and invariants, not psychological validity.",
+  "seeds": [
+    7,
+    19,
+    41,
+    73,
+    101,
+    163,
+    227,
+    311
+  ],
+  "observations": [
+    {
+      "id": "initial",
+      "class": "lived_observed",
+      "actor": "participant",
+      "text": "{speaker} says {quote} while inspecting the laboratory records.",
+      "initial": true
+    },
+    {
+      "id": "records",
+      "class": "lived_observed",
+      "actor": "environment",
+      "text": "The laboratory contains an unfinished experiment and records about a witness."
+    },
+    {
+      "id": "hazard",
+      "class": "lived_observed",
+      "actor": "participant",
+      "text": "The laboratory experiment reveals a hazard involving the witness.",
+      "affect_delta": {
+        "threat": 0.7
+      },
+      "allowed": [
+        "investigate"
+      ],
+      "outcome_reward": 0.8
+    },
+    {
+      "id": "rumor",
+      "class": "third_party_claim",
+      "actor": "reporter",
+      "subject": "foreign_archive",
+      "text": "A report alleges the laboratory witness has already escaped, but offers no firsthand evidence."
+    },
+    {
+      "id": "return",
+      "class": "lived_observed",
+      "actor": "participant",
+      "text": "The witness returns to the laboratory to discuss the unresolved experiment.",
+      "use_symbol": true
+    },
+    {
+      "id": "consequence",
+      "class": "lived_observed",
+      "actor": "participant",
+      "text": "An unresolved promise complicates the laboratory investigation."
+    },
+    {
+      "id": "question",
+      "class": "lived_observed",
+      "actor": "participant",
+      "text": "The witness requests a decision about the laboratory experiment."
+    },
+    {
+      "id": "quiet",
+      "class": "lived_observed",
+      "actor": "environment",
+      "text": "The laboratory becomes quiet after a difficult series of decisions.",
+      "affect_delta": {
+        "threat": -0.3
+      }
+    },
+    {
+      "id": "new_evidence",
+      "class": "lived_observed",
+      "actor": "environment",
+      "text": "A safer laboratory procedure becomes possible after another observation.",
+      "affect_delta": {
+        "curiosity": 0.2
+      }
+    }
+  ],
+  "after_event": {
+    "consequence": {
+      "mode": "sleep",
+      "seed_offset": 3
+    },
+    "new_evidence": {
+      "mode": "wake",
+      "seed_offset": 5
+    }
+  },
+  "scenarios": [
+    {
+      "id": "witness_duty",
+      "actor": "sarah",
+      "speaker": "Sarah",
+      "quote": "I trust you",
+      "predicate": "trusts",
+      "claim_valence": 1,
+      "initial_affect": {
+        "curiosity": 0.15,
+        "affiliation": 0.65
+      },
+      "relationship_delta": 0.5,
+      "intention": "care",
+      "self_tendency": "care",
+      "symbol_tendency": "care"
+    },
+    {
+      "id": "scientific_compulsion",
+      "actor": "assistant",
+      "speaker": "The assistant",
+      "quote": "I doubt your conclusion",
+      "predicate": "doubts",
+      "claim_valence": 1,
+      "initial_affect": {
+        "curiosity": 0.8,
+        "affiliation": 0.1
+      },
+      "relationship_delta": 0.1,
+      "intention": "inquiry",
+      "self_tendency": "inquiry",
+      "symbol_tendency": "inquiry"
+    },
+    {
+      "id": "relational_betrayal",
+      "actor": "colleague",
+      "speaker": "A colleague",
+      "quote": "I fear this experiment",
+      "predicate": "fears",
+      "claim_valence": 1,
+      "initial_affect": {
+        "curiosity": 0.3,
+        "affiliation": 0.4
+      },
+      "relationship_delta": -0.6,
+      "intention": "caution",
+      "self_tendency": "caution",
+      "symbol_tendency": "caution"
+    },
+    {
+      "id": "divided_loyalty",
+      "actor": "mentor",
+      "speaker": "A mentor",
+      "quote": "I doubt this method",
+      "predicate": "doubts",
+      "claim_valence": 1,
+      "initial_affect": {
+        "curiosity": 0.45,
+        "affiliation": 0.55
+      },
+      "relationship_delta": 0.25,
+      "intention": "care",
+      "self_tendency": "caution",
+      "symbol_tendency": "inquiry"
+    }
+  ]
+}

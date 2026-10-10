@@ -1,0 +1,60 @@
+name: Noetic longitudinal causal matrix
+
+on:
+  push:
+    branches: [exp/noetic-longitudinal-matrix-v01]
+  pull_request:
+    branches: [feat/noetic-full-architecture-v02]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile and run complete regression suite
+        run: |
+          python -m compileall -q noetic_engine experiments tests
+          python -m unittest discover -s tests -v
+      - name: Execute prespecified synthetic factorial experiment
+        run: |
+          python -m experiments.matrix_v01 --output evidence/matrix_v01_cases.json > evidence_summary.json
+          python -m json.tool evidence/matrix_v01_cases.json > /dev/null
+          python -m json.tool evidence_summary.json > /dev/null
+          cat evidence_summary.json
+      - name: Permanently preserve frozen case-level evidence
+        if: github.event_name == 'push' && github.ref == 'refs/heads/exp/noetic-longitudinal-matrix-v01'
+        run: |
+          mkdir -p results/matrix_v01
+          gzip -n -9 -c evidence/matrix_v01_cases.json > /tmp/matrix-v01-cases.json.gz
+          if test -f results/matrix_v01/cases.json.gz; then
+            cmp -s results/matrix_v01/cases.json.gz /tmp/matrix-v01-cases.json.gz || { echo "Frozen case-level evidence mismatch"; exit 1; }
+            cmp -s results/matrix_v01/aggregate.json evidence_summary.json || { echo "Frozen summary mismatch"; exit 1; }
+            echo "Previously archived results match regenerated evidence."
+          else
+            cp /tmp/matrix-v01-cases.json.gz results/matrix_v01/cases.json.gz
+            cp evidence_summary.json results/matrix_v01/aggregate.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add results/matrix_v01/cases.json.gz results/matrix_v01/aggregate.json
+            git commit -m "results: permanently archive frozen synthetic matrix 001 evidence"
+            git push origin HEAD:exp/noetic-longitudinal-matrix-v01
+            echo "Case-level results archived in the experiment branch."
+          fi
+      - name: Upload full case-level evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: noetic-matrix-v01-raw-cases
+          path: |
+            evidence/matrix_v01_cases.json
+            evidence_summary.json
+            experiments/fixtures/longitudinal_matrix_v01.json
+          if-no-files-found: error
+          retention-days: 90

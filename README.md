@@ -55,6 +55,27 @@ from noetic_engine.local_renderers import OllamaRenderer
 # dialogue = OllamaRenderer("qwen3:1.5b").render(brief_from_decision(brain, decision_id))
 ```
 
+## First matched longitudinal evidence
+
+Synthetic MATRIX-001 is executed and documented at
+[`results/MATRIX_001_RESULTS.md`](results/MATRIX_001_RESULTS.md). It contains
+416 condition/scenario/seed trajectories with complete permanent compressed
+case-level evidence in [`results/matrix_v01/cases.json.gz`](results/matrix_v01/cases.json.gz)
+and aggregate JSON in [`results/matrix_v01/aggregate.json`](results/matrix_v01/aggregate.json).
+The sealed protocol lives at [`experiments/PROTOCOL_MATRIX_001.md`](experiments/PROTOCOL_MATRIX_001.md).
+Both the neutral symbolic label substitution and the Oracle removal are exact
+policy nulls in this synthetic assay. Egregore and cue ablations shift some
+scores without changing a single selected action; recurrent field removal
+changes only three of 352 matched choices. None of these changes establishes
+better longitudinal character fidelity, and no independently correct answers
+are available in this fixture.
+
+Run the reproducible matrix with:
+
+```sh
+python -m experiments.matrix_v01 --output evidence/matrix_v01_cases.json
+```
+
 ## License and citation
 
 No license is granted by this README. Manuscript is an unpublished conceptual preprint draft, **not peer reviewed**. Citations in the manuscript are linked to verified primary records.
