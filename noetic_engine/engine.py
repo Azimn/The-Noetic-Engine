@@ -4,6 +4,7 @@ from .models import Configuration
 from .store import digest
 from .extensions import install
 from .egregore import record_claim, review_claim
+from .selfmodel import propose as propose_self, review as review_self
 from .oracle_guard import review as review_oracle_record
 from .development import consolidate, lesion_signature
 from .store import Store
@@ -77,6 +78,14 @@ class NoeticEngine:
         with self.store.tx():
             review_claim(self.store,claim_id,reviewer,disposition)
 
+    def propose_self_hypothesis(self,origin,predicate,tendency,valence,confidence):
+        with self.store.tx():
+            return propose_self(self.store,origin,predicate,tendency,valence,confidence)
+
+    def review_self_hypothesis(self,hypothesis_id,reviewer,disposition):
+        with self.store.tx():
+            review_self(self.store,hypothesis_id,reviewer,disposition)
+
     def review_oracle(self,hypothesis_id,reviewer,disposition,justification):
         with self.store.tx():
             return review_oracle_record(self.store,hypothesis_id,reviewer,
@@ -100,7 +109,8 @@ class NoeticEngine:
           "developmental_state":lesion_signature(db.db),
           "social_claims":[dict(r) for r in db.db.execute("SELECT * FROM social_claims ORDER BY id")],
           "oracle_reviews":[dict(r) for r in db.db.execute("SELECT * FROM oracle_reviews ORDER BY id")],
-          "configuration_digest":db.meta("config_digest")
+          "configuration_digest":db.meta("config_digest"),
+          "self_hypotheses":[dict(r) for r in db.db.execute("SELECT * FROM self_hypotheses ORDER BY id")]
         }
 
     def close(self):self.store.close()
