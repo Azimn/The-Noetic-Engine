@@ -49,6 +49,7 @@ class Observation:
     affect_delta: dict[str, float] = field(default_factory=dict)
     relationship_delta: float = 0.0
     cue: str = ""
+    signals: dict[str,float] = field(default_factory=dict)
 
     def validate(self, owner: str):
         if not all(isinstance(x, str) and x.strip() for x in (
@@ -67,6 +68,11 @@ class Observation:
         for v in self.affect_delta.values():
             bounded(v)
         bounded(self.relationship_delta)
+        if self.signals:
+            from .consequence_head import validate_facts
+            validate_facts(self.signals)
+            if self.evidence_class is not EvidenceClass.LIVED_OBSERVED or self.subject_id!=owner:
+                raise InvalidEvidence("untrusted subject cannot supply world facts")
         if self.cue and len(self.cue) > 100:
             raise InvalidEvidence("cue too long")
         if self.evidence_class is not EvidenceClass.LIVED_OBSERVED and (
@@ -94,6 +100,10 @@ class Configuration:
     neural_seed: int = 1701
     conditional_context: bool = False
     conditional_repair_gain: float = 0.12
+    consequence_head: bool = False
+    outcome_learning_enabled: bool = True
+    consequence_gain: float = 1.0
+    consequence_lr: float = 0.35
 
     def validate(self):
         if not self.subject_id or not self.subject_id.strip():
@@ -102,6 +112,8 @@ class Configuration:
             bounded(getattr(self, k), 0, 1)
         bounded(self.cap_total, 0, 3)
         bounded(self.conditional_repair_gain,0,0.5)
+        bounded(self.consequence_gain,0,4)
+        bounded(self.consequence_lr,0,1)
         if type(self.neural_units) is not int or not 12<=self.neural_units<=4096:
             raise ValueError("neural_units must be between 12 and 4096")
         if type(self.neural_seed) is not int or not 0<=self.neural_seed<2**31:
