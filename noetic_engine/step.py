@@ -2,6 +2,7 @@
 from dataclasses import asdict
 from .models import ACTIONS, clip
 from .development import advance
+from .neural_field import propagate as neural_propagate
 from .store import serial,digest
 from .memory import retrieve
 from .oracle import propose
@@ -56,6 +57,10 @@ def perform(engine,observation,allowed=None,seed=0):
         state=propagate(db.db,cfg,observation.actor_id,observation.cue)
         if cfg.developmental:
             state=advance(db.db,state,tick)
+        if cfg.neural_field:
+            adjusted,neurals=neural_propagate(db.db,cfg.subject_id,state["field"],tick)
+            state["field"]=adjusted
+            state["neural"]=neurals
         action,scores=arbitrate(state,actions)
         audit={"tick":tick,"action":action,"scores":scores,"state":state,
                "observation_id":record_id,"origin_id":observation.origin_id,
