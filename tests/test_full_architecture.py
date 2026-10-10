@@ -32,6 +32,8 @@ class ExtendedBoundaries(unittest.TestCase):
     def test_no_foreign_mind_or_hearsay_admission(self):
         self.brain.step(lived("a"))
         with self.assertRaises(InvalidEvidence):
+            self.brain.add_social_claim("a","sarah",OWNER,"fears",1.,1.,"direct_quote","invented quotation")
+        with self.assertRaises(InvalidEvidence):
             self.brain.add_social_claim("a","different-witness",OWNER,"fears",1.,1.,"direct_quote")
         rumor=Observation("rumor","outsider","Sarah supposedly fears Pretorius",
                           "unverified-note",EvidenceClass.THIRD_PARTY_CLAIM,"speaker")
