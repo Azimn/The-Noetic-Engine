@@ -1,11 +1,12 @@
 """Bounded, inspectable coupling between experience, social state and policy."""
 from .models import TENDENCIES, ACTION_WEIGHTS, clip
 from .egregore import pressure
+from .selfmodel import pressure as self_pressure
 
 def propagate(db, cfg, actor, cue):
     affect={r["name"]:r["value"] for r in db.execute("SELECT * FROM affect")}
     prior={r["name"]:(r["value"],r["target"]) for r in db.execute("SELECT * FROM field")}
-    family={k:{"affect":0.0,"intention":0.0,"social":0.0,"cue":0.0,"regulator":0.0,"attributed_belief":0.0} for k in TENDENCIES}
+    family={k:{"affect":0.0,"intention":0.0,"social":0.0,"cue":0.0,"regulator":0.0,"attributed_belief":0.0,"self_model":0.0} for k in TENDENCIES}
     family["inquiry"]["affect"]=0.45*affect["curiosity"]-0.18*affect["fatigue"]-0.12*affect["threat"]
     family["care"]["affect"]=0.48*affect["affiliation"]-0.20*affect["threat"]
     family["caution"]["affect"]=0.55*affect["threat"]+0.10*affect["fatigue"]
@@ -22,6 +23,11 @@ def propagate(db, cfg, actor, cue):
         attributed,social_claim_ids=pressure(db,actor,cfg.subject_id)
         for tendency,val in attributed.items():
             family[tendency]["attributed_belief"]=val
+    self_ids=[]
+    if cfg.self_model:
+        self_vals,self_ids=self_pressure(db)
+        for tendency,val in self_vals.items():
+            family[tendency]["self_model"]=val
     if cfg.cues and cue:
         r=db.execute("SELECT * FROM symbols WHERE symbol=?",(cue,)).fetchone()
         if r: family[r["tendency"]]["cue"]+=r["strength"]
@@ -30,12 +36,12 @@ def propagate(db, cfg, actor, cue):
         old,target=prior[k]
         if cfg.regulator:
             family[k]["regulator"]=clip(cfg.regulator_gain*(target-old),-0.12,0.12)
-        for name in ("affect","intention","social","cue","attributed_belief"):
+        for name in ("affect","intention","social","cue","attributed_belief","self_model"):
             family[k][name]=clip(family[k][name],-cfg.cap_family,cfg.cap_family)
         total=clip(sum(family[k].values()),-cfg.cap_total,cfg.cap_total)
         new[k]=round(clip((1-cfg.decay)*old+total),9)
         db.execute("UPDATE field SET value=? WHERE name=?",(new[k],k))
-    return {"field":new,"causes":family,"affect":affect,"attributed_claim_ids":social_claim_ids}
+    return {"field":new,"causes":family,"affect":affect,"attributed_claim_ids":social_claim_ids,"self_hypothesis_ids":self_ids}
 
 def arbitrate(state, allowed):
     scores={}
