@@ -88,6 +88,7 @@ class Configuration:
     policy_version: str = "noetic-v0.1"
     developmental: bool = False
     egregore: bool = False
+    self_model: bool = False
 
     def validate(self):
         if not self.subject_id or not self.subject_id.strip():
