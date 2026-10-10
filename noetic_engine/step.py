@@ -3,6 +3,7 @@ from dataclasses import asdict
 from .models import ACTIONS, clip
 from .development import advance
 from .context_field import apply as context_apply
+from .consequence_head import choose as choice_choose, register as choice_register
 from .neural_field import propagate as neural_propagate
 from .store import serial,digest
 from .memory import retrieve
@@ -30,7 +31,7 @@ def perform(engine,observation,allowed=None,seed=0):
         record_id=cur.lastrowid
         db.event(tick,"observation",{"record_id":record_id,**core,
             "affect_delta":observation.affect_delta,"relationship_delta":observation.relationship_delta,
-            "cue":observation.cue,"seed":seed,"allowed":list(actions),
+            "cue":observation.cue,"signals":observation.signals,"seed":seed,"allowed":list(actions),
             "config_snapshot":asdict(cfg)})
         trusted=observation.evidence_class.value=="lived_observed"
         if trusted:
@@ -65,6 +66,12 @@ def perform(engine,observation,allowed=None,seed=0):
             state["field"]=adjusted
             state["neural"]=neurals
         action,scores=arbitrate(state,actions)
+        contextual=choice_choose(db.db,cfg,observation,tick,scores,actions)
+        if contextual:
+            action=contextual["selected"]
+            state["choice_head"]={"feature_basis":contextual["features"],
+                                  "by_action":contextual["by_action"],
+                                  "version":contextual["version"]}
         audit={"tick":tick,"action":action,"scores":scores,"state":state,
                "observation_id":record_id,"origin_id":observation.origin_id,
                "memory_pointers":memories,"oracle":hypothesis,
@@ -73,6 +80,8 @@ def perform(engine,observation,allowed=None,seed=0):
         cur=db.db.execute("INSERT INTO decisions(tick,action,audit,hash) VALUES(?,?,?,?)",
                           (tick,action,serial(audit),stored_digest))
         audit["decision_id"]=cur.lastrowid
+        if contextual:
+            choice_register(db.db,cur.lastrowid,contextual,tick)
         db.event(tick,"policy_decision",{"decision_id":cur.lastrowid,
                                          "action":action,"audit_digest":stored_digest})
         db.put("tick",tick)
