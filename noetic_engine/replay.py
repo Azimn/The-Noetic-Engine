@@ -34,7 +34,7 @@ def replay_database(source_path,destination_path):
             if digest(core)!=r["hash"]:
                 raise ValueError("source observation integrity failure")
         snapshots=[json.loads(e["payload"])["config_snapshot"] for e in events
-                   if e["kind"]=="observation" and "config_snapshot" in json.loads(e["payload"])]
+                   if e["kind"] in ("observation","pulse_input") and "config_snapshot" in json.loads(e["payload"])]
         if not snapshots: raise ValueError("legacy ledger lacks complete replay configuration")
         config=Configuration(**snapshots[0])
         if any(snapshot!=snapshots[0] for snapshot in snapshots):
