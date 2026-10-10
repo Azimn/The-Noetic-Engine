@@ -71,6 +71,16 @@ class Reproducibility(unittest.TestCase):
         self.brain.record_outcome(r["decision_id"],0.5,authority="adjudicated_outcome",
                                   source_origin="b")
 
+    def test_mutable_projection_tamper_detected_by_replay(self):
+        self.run_history()
+        self.brain.close()
+        with sqlite3.connect(self.source) as connection:
+            connection.execute("UPDATE field SET value=0.987 WHERE name='care'")
+        self.brain=NoeticEngine(self.source,self.cfg)
+        self.assertTrue(self.brain.store.verify())
+        with self.assertRaisesRegex(ValueError,"projection divergence"):
+            replay_database(self.source,os.path.join(self.tmp.name,"tampered.sqlite"))
+
     def test_source_tamper_detected_at_replay(self):
         self.brain.step(observed("a"))
         self.brain.close()
