@@ -19,8 +19,8 @@ class ExtendedBoundaries(unittest.TestCase):
     def tearDown(self):self.brain.close();self.tmp.cleanup()
 
     def test_social_attribution_needs_source_and_review(self):
-        self.brain.step(lived("witness"))
-        ident=self.brain.add_social_claim("witness","sarah",OWNER,"fears",1.,0.9,"direct_quote")
+        self.brain.step(lived("witness",text="Sarah said I fear the experiment in the laboratory"))
+        ident=self.brain.add_social_claim("witness","sarah",OWNER,"fears",1.,0.9,"direct_quote","I fear the experiment")
         before=self.brain.step(lived("before"))
         self.assertEqual(before["state"]["causes"]["caution"]["attributed_belief"],0.)
         self.brain.review_social_claim(ident,"external-reviewer","admitted_for_policy")
