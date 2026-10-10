@@ -2,7 +2,7 @@
 from .models import TENDENCIES, ACTION_WEIGHTS, clip
 
 def propagate(db, cfg, actor, cue):
-    affect=db.mapping("affect","name","value")
+    affect={r["name"]:r["value"] for r in db.execute("SELECT * FROM affect")}
     prior={r["name"]:(r["value"],r["target"]) for r in db.execute("SELECT * FROM field")}
     family={k:{"affect":0.0,"intention":0.0,"social":0.0,"cue":0.0,"regulator":0.0} for k in TENDENCIES}
     family["inquiry"]["affect"]=0.45*affect["curiosity"]-0.18*affect["fatigue"]-0.12*affect["threat"]
