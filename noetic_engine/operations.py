@@ -28,7 +28,7 @@ def bind_symbol(db,symbol,tendency,strength,origin,tick):
     db.db.execute("INSERT INTO symbols VALUES(?,?,?,?)",(symbol,tendency,strength,r["id"]))
     db.event(tick,"symbol_bound",{"symbol":symbol,"tendency":tendency,"strength":strength,"origin":origin})
 
-def outcome(db,decision_id,reward,tick):
+def outcome(db,decision_id,reward,tick,update_legacy=True):
     reward=bounded(reward)
     r=db.db.execute("SELECT action FROM decisions WHERE id=?",(decision_id,)).fetchone()
     if not r:raise ValueError("unknown decision")
@@ -36,5 +36,6 @@ def outcome(db,decision_id,reward,tick):
         import json
         if json.loads(e["payload"])["decision_id"]==decision_id:
             raise ValueError("duplicate outcome")
-    learn_from_outcome(db.db,r["action"],reward)
+    if update_legacy:
+        learn_from_outcome(db.db,r["action"],reward)
     db.event(tick,"outcome",{"decision_id":decision_id,"reward":reward})
