@@ -1,0 +1,58 @@
+name: Noetic MATRIX-002 Recovery Lab
+
+on:
+  push:
+    branches: [exp/noetic-matrix-002-recovery]
+  pull_request:
+    branches: [exp/noetic-longitudinal-matrix-v01]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  recovery-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile and execute existing and recovery tests
+        run: |
+          python -m compileall -q noetic_engine experiments tests
+          python -m unittest discover -s tests -v
+      - name: Execute all fixed recovery and learning forks
+        run: |
+          python -m experiments.matrix_002 --output evidence/matrix_002_full_cases.json > evidence_summary_002.json
+          python -m json.tool evidence/matrix_002_full_cases.json > /dev/null
+          python -m json.tool evidence_summary_002.json > /dev/null
+          cat evidence_summary_002.json
+      - name: Preserve immutable executed evidence in experiment branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/exp/noetic-matrix-002-recovery'
+        run: |
+          mkdir -p results/matrix_002
+          gzip -n -9 -c evidence/matrix_002_full_cases.json > /tmp/matrix002-cases.json.gz
+          if test -f results/matrix_002/cases.json.gz; then
+            cmp -s results/matrix_002/cases.json.gz /tmp/matrix002-cases.json.gz || { echo "Immutable raw evidence conflict"; exit 1; }
+            cmp -s results/matrix_002/aggregate.json evidence_summary_002.json || { echo "Aggregate conflict"; exit 1; }
+          else
+            cp /tmp/matrix002-cases.json.gz results/matrix_002/cases.json.gz
+            cp evidence_summary_002.json results/matrix_002/aggregate.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add results/matrix_002
+            git commit -m "results: preserve fixed MATRIX-002 full checkpoint-fork traces"
+            git push origin HEAD:exp/noetic-matrix-002-recovery
+          fi
+      - name: Upload complete case-level result artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: matrix-002-recovery-full-cases
+          path: |
+            evidence/matrix_002_full_cases.json
+            evidence_summary_002.json
+            experiments/fixtures/matrix_002_independent_v01.json
+          retention-days: 90
+          if-no-files-found: error

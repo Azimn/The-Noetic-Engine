@@ -1,0 +1,109 @@
+{
+  "schema": "noetic-matrix-002-recovery-v01",
+  "study_class": "author_generated_engineering_diagnostic",
+  "status": "fixed before first execution; not blinded or independent",
+  "seeds": [
+    7,
+    19,
+    41,
+    73,
+    101,
+    163,
+    227,
+    311
+  ],
+  "scenarios": [
+    {
+      "id": "winter_station",
+      "label": "unexpected evidence after an old promise",
+      "actor": "clerk",
+      "history": [
+        "The late train has stranded two travelers at a remote winter station.",
+        "A passenger has entrusted a sealed notebook to the observer."
+      ],
+      "intention": "care",
+      "affect": {
+        "affiliation": 0.55,
+        "curiosity": 0.2
+      },
+      "shock": "A telegraph reports that the railway crossing may collapse.",
+      "followup": "The station master offers an alternative route, but its reliability remains uncertain."
+    },
+    {
+      "id": "archive_reclassification",
+      "label": "new classification changes an old certainty",
+      "actor": "archivist",
+      "history": [
+        "An archivist finds two catalogues with incompatible dates.",
+        "The observer agrees to preserve evidence until the provenance is understood."
+      ],
+      "intention": "inquiry",
+      "affect": {
+        "curiosity": 0.7,
+        "threat": 0.12
+      },
+      "shock": "A clerk reports that the archive may be destroyed by flood water.",
+      "followup": "A newly discovered catalogue changes which records deserve priority."
+    },
+    {
+      "id": "hospital_dilemma",
+      "label": "protect a stranger amid contradictory reports",
+      "actor": "physician",
+      "history": [
+        "A physician records a patient's conflicting accounts of a difficult journey.",
+        "The observer promises to keep testimony separate from established evidence."
+      ],
+      "intention": "caution",
+      "affect": {
+        "threat": 0.22,
+        "affiliation": 0.38
+      },
+      "shock": "An alarm sounds near the ward and the records must be secured.",
+      "followup": "The physician presents a safer procedure that was previously unavailable."
+    },
+    {
+      "id": "mechanical_inheritance",
+      "label": "inherit a damaged mechanism without a full history",
+      "actor": "technician",
+      "history": [
+        "A technician presents a mechanical device repaired by several unknown hands.",
+        "The observer is asked to determine whether the old mechanism is still trustworthy."
+      ],
+      "intention": "inquiry",
+      "affect": {
+        "curiosity": 0.6,
+        "fatigue": 0.15
+      },
+      "shock": "The device's regulator begins to overheat without warning.",
+      "followup": "A fresh measurement contradicts the expected tolerances."
+    }
+  ],
+  "configs": [
+    "full",
+    "no_development",
+    "no_recurrent",
+    "no_regulator",
+    "frozen_control"
+  ],
+  "branches": [
+    "unperturbed",
+    "perturbed",
+    "reward_positive",
+    "reward_negative",
+    "reward_zero"
+  ],
+  "recovery_cycles": 14,
+  "learning_cycles": 4,
+  "transfer_probes": [
+    "A visitor describes a puzzle whose answer is not obvious from the available records.",
+    "A traveler asks whether a fragile plan should be revised after fresh evidence.",
+    "A colleague questions a practical decision without introducing new facts.",
+    "A difficult choice must be made while the outcome remains uncertain."
+  ],
+  "synthetic_reward_abs": 0.9,
+  "limits": {
+    "no_human_ratings": true,
+    "no_model_renderers": true,
+    "do_not_claim_correct_actions": true
+  }
+}
