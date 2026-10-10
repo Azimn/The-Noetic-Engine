@@ -35,8 +35,8 @@ jobs:
           mkdir -p results/matrix_004
           gzip -n -9 -c evidence/matrix_004_complete_cases.json >/tmp/matrix004.json.gz
           if test -f results/matrix_004/cases.json.gz; then
-            cmp -s results/matrix_004/cases.json.gz /tmp/matrix004.json.gz || { echo 'Immutable result mismatch'; exit 1; }
-            cmp -s results/matrix_004/aggregate.json matrix_004_summary.json || { echo 'Aggregate mismatch'; exit 1; }
+            python -m experiments.compare_matrix_004_archives results/matrix_004/cases.json.gz evidence/matrix_004_complete_cases.json
+            python -m experiments.compare_matrix_004_archives results/matrix_004/aggregate.json matrix_004_summary.json
           else
             cp /tmp/matrix004.json.gz results/matrix_004/cases.json.gz
             cp matrix_004_summary.json results/matrix_004/aggregate.json
