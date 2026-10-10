@@ -6,7 +6,7 @@ on:
     branches: [exp/noetic-matrix-004-consequence-learning]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   third-party-world:
     runs-on: ubuntu-latest
@@ -27,6 +27,39 @@ jobs:
       - name: External API and reward handshake (without game answers)
         run: |
           python -m experiments.external_textworld_smoke | tee /tmp/twe-smoke.json
-      - name: Noetic regression suite
+      - name: Noetic regression suite and external command security
         run: |
           python -m unittest discover -s tests -v
+      - name: Execute externally scored 2-game benchmark
+        run: |
+          mkdir -p evidence
+          python -m experiments.matrix_005 --output evidence/matrix005_all_cases.json | tee evidence/matrix005_summary.json
+          python -m json.tool evidence/matrix005_all_cases.json >/dev/null
+          python -m json.tool evidence/matrix005_summary.json >/dev/null
+      - name: Preserve complete raw results
+        if: github.event_name == 'push' && github.ref == 'refs/heads/exp/noetic-matrix-005-textworldexpress'
+        run: |
+          mkdir -p results/matrix_005
+          gzip -n -9 -c evidence/matrix005_all_cases.json >/tmp/matrix005_cases.json.gz
+          if test -f results/matrix_005/cases.json.gz; then
+            cmp -s results/matrix_005/cases.json.gz /tmp/matrix005_cases.json.gz || { echo 'Frozen evidence differs'; exit 1; }
+            cmp -s results/matrix_005/summary.json evidence/matrix005_summary.json || { echo 'Frozen summary differs'; exit 1; }
+          else
+            cp /tmp/matrix005_cases.json.gz results/matrix_005/cases.json.gz
+            cp evidence/matrix005_summary.json results/matrix_005/summary.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add results/matrix_005
+            git commit -m "results: archive external TextWorldExpress MATRIX-005 cases"
+            git push origin HEAD:exp/noetic-matrix-005-textworldexpress
+          fi
+      - name: Upload full per-command evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: noetic-textworldexpress-matrix005-all-cases
+          path: |
+            evidence/matrix005_all_cases.json
+            evidence/matrix005_summary.json
+            experiments/PROTOCOL_MATRIX_005.md
+          retention-days: 90
+          if-no-files-found: error
