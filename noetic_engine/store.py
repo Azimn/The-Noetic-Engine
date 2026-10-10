@@ -56,5 +56,18 @@ class Store:
     def verify(self):
         return (all(digest(json.loads(r["payload"]))==r["hash"] for r in self.db.execute("SELECT payload,hash FROM events")) and
                 all(digest(json.loads(r["audit"]))==r["hash"] for r in self.db.execute("SELECT audit,hash FROM decisions")) and
-                all(digest({"origin_id":r["origin"],"subject_id":r["subject"],"actor_id":r["actor"],"evidence_class":r["class"],"source":r["source"],"text":r["text"]})==r["hash"] for r in self.db.execute("SELECT * FROM observations")))
+                all(digest({"origin_id":r["origin"],"subject_id":r["subject"],"actor_id":r["actor"],"evidence_class":r["class"],"source":r["source"],"text":r["text"]})==r["hash"] for r in self.db.execute("SELECT * FROM observations")) and
+                self._verify_extensions())
+    def _verify_extensions(self):
+        try:
+            recurrent=all(digest(json.loads(r["payload"]))==r["digest"]
+                for r in self.db.execute("SELECT payload,digest FROM recurrent_state"))
+            developmental=all(digest({
+                "field":json.loads(r["values_json"]),
+                "development":json.loads(r["template_json"])})==r["digest"]
+                for r in self.db.execute(
+                    "SELECT values_json,template_json,digest FROM field_snapshots"))
+            return recurrent and developmental
+        except (sqlite3.Error,ValueError,TypeError,KeyError):
+            return False
     def close(self):self.db.close()

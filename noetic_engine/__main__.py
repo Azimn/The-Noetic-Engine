@@ -1,13 +1,15 @@
 """Command-line chassis for the auditable Noetic Engine."""
 import argparse,json,sys
 from .engine import NoeticEngine
-from .models import Observation,EvidenceClass
+from .models import Observation,EvidenceClass,Configuration
 
 def main(argv=None):
     p=argparse.ArgumentParser(description="Noetic Engine research harness")
     p.add_argument("--db",default="noetic.sqlite")
+    p.add_argument("--profile",choices=("baseline","full"),default="baseline")
     sub=p.add_subparsers(dest="command",required=True)
     sub.add_parser("status");sub.add_parser("demo")
+    cycle=sub.add_parser("pulse");cycle.add_argument("--mode",choices=("wake","sleep"),default="wake");cycle.add_argument("--seed",type=int,default=0)
     run=sub.add_parser("step")
     run.add_argument("origin_id");run.add_argument("text")
     run.add_argument("--actor",default="environment")
@@ -24,8 +26,12 @@ def main(argv=None):
     symbol=sub.add_parser("bind");symbol.add_argument("symbol");symbol.add_argument("tendency");symbol.add_argument("source_origin")
     args=p.parse_args(argv)
     try:
-        with NoeticEngine(args.db) as brain:
+        profile=(Configuration() if args.profile=="baseline" else
+            Configuration(developmental=True,egregore=True,self_model=True,
+                          neural_field=True,policy_version="noetic-v0.2-full"))
+        with NoeticEngine(args.db,profile) as brain:
             if args.command=="status":result=brain.status()
+            elif args.command=="pulse":result=brain.pulse(seed=args.seed,mode=args.mode)
             elif args.command=="intend":
                 brain.add_intention(args.id,args.label,args.tendency);result=brain.status()
             elif args.command=="resolve":

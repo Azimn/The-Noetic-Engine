@@ -1,7 +1,7 @@
 name: Noetic Engine CI
 on:
   push:
-    branches: [main, feat/noetic-field-foundation]
+    branches: [main, 'feat/**']
   pull_request:
     branches: [main]
 jobs:
@@ -23,3 +23,6 @@ jobs:
         run: |
           python -m noetic_engine --db /tmp/noetic-ci.sqlite demo >/tmp/noetic-demo.json
           python -m noetic_engine --db /tmp/noetic-ci.sqlite status
+          python -m noetic_engine --db /tmp/noetic-full-ci.sqlite --profile full demo > /tmp/noetic-full-demo.json
+          python -m noetic_engine --db /tmp/noetic-full-ci.sqlite --profile full pulse --mode sleep --seed 7 > /tmp/noetic-sleep.json
+          python -m noetic_engine --db /tmp/noetic-full-ci.sqlite --profile full status > /tmp/noetic-full-status.json

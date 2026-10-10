@@ -1,5 +1,8 @@
 """Complete observation-to-decision transaction with inspectable contributions."""
+from dataclasses import asdict
 from .models import ACTIONS, clip
+from .development import advance
+from .neural_field import propagate as neural_propagate
 from .store import serial,digest
 from .memory import retrieve
 from .oracle import propose
@@ -24,7 +27,10 @@ def perform(engine,observation,allowed=None,seed=0):
               (tick,observation.origin_id,observation.subject_id,observation.actor_id,
                observation.source,observation.evidence_class.value,observation.text,digest(core)))
         record_id=cur.lastrowid
-        db.event(tick,"observation",{"record_id":record_id,**core})
+        db.event(tick,"observation",{"record_id":record_id,**core,
+            "affect_delta":observation.affect_delta,"relationship_delta":observation.relationship_delta,
+            "cue":observation.cue,"seed":seed,"allowed":list(actions),
+            "config_snapshot":asdict(cfg)})
         trusted=observation.evidence_class.value=="lived_observed"
         if trusted:
             for k,delta in observation.affect_delta.items():
@@ -49,15 +55,22 @@ def perform(engine,observation,allowed=None,seed=0):
         memories=[x for x in retrieve(db.db,observation.text) if x["id"]!=record_id]
         hypothesis=propose(db.db,tick,seed,memories) if cfg.oracle else None
         state=propagate(db.db,cfg,observation.actor_id,observation.cue)
+        if cfg.developmental:
+            state=advance(db.db,state,tick)
+        if cfg.neural_field:
+            adjusted,neurals=neural_propagate(db.db,cfg.subject_id,state["field"],tick)
+            state["field"]=adjusted
+            state["neural"]=neurals
         action,scores=arbitrate(state,actions)
         audit={"tick":tick,"action":action,"scores":scores,"state":state,
                "observation_id":record_id,"origin_id":observation.origin_id,
                "memory_pointers":memories,"oracle":hypothesis,
                "allowed_actions":list(actions),"config":cfg.policy_version}
+        stored_digest=digest(audit)
         cur=db.db.execute("INSERT INTO decisions(tick,action,audit,hash) VALUES(?,?,?,?)",
-                          (tick,action,serial(audit),digest(audit)))
+                          (tick,action,serial(audit),stored_digest))
         audit["decision_id"]=cur.lastrowid
         db.event(tick,"policy_decision",{"decision_id":cur.lastrowid,
-                                         "action":action,"audit_digest":digest(audit)})
+                                         "action":action,"audit_digest":stored_digest})
         db.put("tick",tick)
     return audit
