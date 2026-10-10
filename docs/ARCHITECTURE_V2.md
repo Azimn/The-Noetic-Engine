@@ -57,7 +57,7 @@ Recurrent layer (opt-in): seeded sparse synthetic recurrent units process tenden
 
 The Egregore is represented by records linking `attributed_actor`, `believed_subject`, `predicate`, valence, uncertainty and an immutable source-origin event. A record is never a direct readout of another person's mind. `direct_quote` requires a subject-owned witnessed event whose speaker matches the attributed speaker. Third-party reports and internally inferred opinions can be stored but **can never directly enter policy**. Direct quotations may enter policy only after a separately recorded explicit disposition. Policy pressure stays capped and decision audits contain contributing claim IDs.
 
-A review is an operator annotation, not cryptographically authenticated authorization, and cannot establish another character's true private belief. A claim that a character fears Pretorius is, at most, an attributed interpretation of their apparent communication.
+Admission of a direct quotation additionally requires an exact nonempty quotation span found verbatim in its immutable originating observation. A matching span prevents unsupported quotation invention but does not verify that the predicate accurately interprets what was said. Migrated older unanchored claims never enter policy.\n\nA review is an operator annotation, not cryptographically authenticated authorization, and cannot establish another character's true private belief. A claim that a character fears Pretorius is, at most, an attributed interpretation of their apparent communication.
 
 ## Self-model and contradiction
 
