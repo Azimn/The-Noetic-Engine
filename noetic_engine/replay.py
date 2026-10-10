@@ -53,7 +53,7 @@ def replay_database(source_path,destination_path):
                 elif kind=="social_claim_recorded":
                     actual=engine.add_social_claim(p["origin"],p["attributed_actor"],
                         p["believed_subject"],p["predicate"],p["valence"],
-                        p["confidence"],p["epistemic"])
+                        p["confidence"],p["epistemic"],p.get("quotation"))
                     if actual!=p["id"]:raise ValueError("social claim ID divergence")
                 elif kind=="social_claim_reviewed":
                     engine.review_social_claim(p["id"],p["reviewer"],p["disposition"])
