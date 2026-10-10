@@ -40,6 +40,12 @@ def install(store):
       FOREIGN KEY(hypothesis_id) REFERENCES self_hypotheses(id));
     CREATE TRIGGER IF NOT EXISTS self_reviews_immutable BEFORE UPDATE ON self_reviews
       BEGIN SELECT RAISE(ABORT,'immutable self review'); END;
+    CREATE TABLE IF NOT EXISTS world_context(
+      ident TEXT PRIMARY KEY,origin TEXT NOT NULL,tendency TEXT NOT NULL,
+      strength REAL NOT NULL,kind TEXT NOT NULL,start_tick INTEGER NOT NULL,
+      status TEXT NOT NULL,resolved_origin TEXT,
+      FOREIGN KEY(origin) REFERENCES observations(origin),
+      FOREIGN KEY(resolved_origin) REFERENCES observations(origin));
     CREATE TABLE IF NOT EXISTS recurrent_state(
       subject_id TEXT PRIMARY KEY, payload TEXT NOT NULL, digest TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS field_snapshots(
@@ -54,13 +60,13 @@ def install(store):
     """)
     with store.tx():
         version=store.meta("noetic_extension_schema")
-        if version not in (None,"1","2","3","4"):
+        if version not in (None,"1","2","3","4","5"):
             raise ValueError("incompatible Noetic extension schema")
         # Additive migration for any prior v0.2 branch database.
         existing={r[1] for r in store.db.execute("PRAGMA table_info(social_claims)")}
         if "quotation" not in existing:
             store.db.execute("ALTER TABLE social_claims ADD COLUMN quotation TEXT NOT NULL DEFAULT ''")
-        store.put("noetic_extension_schema","4")
+        store.put("noetic_extension_schema","5")
         for name in ("inquiry","care","caution"):
             store.db.execute("""INSERT OR IGNORE INTO developmental_state
               VALUES(?,0,0,0,0)""",(name,))

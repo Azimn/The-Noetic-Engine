@@ -92,6 +92,8 @@ class Configuration:
     neural_field: bool = False
     neural_units: int = 96
     neural_seed: int = 1701
+    conditional_context: bool = False
+    conditional_repair_gain: float = 0.12
 
     def validate(self):
         if not self.subject_id or not self.subject_id.strip():
@@ -99,6 +101,7 @@ class Configuration:
         for k in ("decay", "cap_family", "regulator_gain"):
             bounded(getattr(self, k), 0, 1)
         bounded(self.cap_total, 0, 3)
+        bounded(self.conditional_repair_gain,0,0.5)
         if type(self.neural_units) is not int or not 12<=self.neural_units<=4096:
             raise ValueError("neural_units must be between 12 and 4096")
         if type(self.neural_seed) is not int or not 0<=self.neural_seed<2**31:

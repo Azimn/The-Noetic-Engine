@@ -48,6 +48,10 @@ def replay_database(source_path,destination_path):
                     engine.add_intention(p["id"],p["label"],p["tendency"],p["strength"])
                 elif kind=="intention_resolved":
                     engine.resolve_intention(p["id"],p["status"])
+                elif kind=="context_bound":
+                    engine.bind_context(p["id"],p["origin"],p["tendency"],p["strength"],p["kind"])
+                elif kind=="context_resolved":
+                    engine.resolve_context(p["id"],p["origin"])
                 elif kind=="symbol_bound":
                     engine.associate_symbol(p["symbol"],p["tendency"],p["origin"],p["strength"])
                 elif kind=="social_claim_recorded":
@@ -107,7 +111,7 @@ def replay_database(source_path,destination_path):
             tables=("meta","affect","field","intentions","relations","symbols",
                     "oracle","social_claims","social_reviews","oracle_reviews",
                     "self_hypotheses","self_reviews","developmental_state",
-                    "field_snapshots","recurrent_state")
+                    "field_snapshots","recurrent_state","world_context")
             for table in tables:
                 left=[tuple(r) for r in source.execute(
                     "SELECT * FROM "+table+" ORDER BY rowid")]

@@ -1,0 +1,59 @@
+name: Noetic MATRIX-003 Conditional Repair
+
+on:
+  push:
+    branches: [exp/noetic-matrix-003-conditional-repair]
+  pull_request:
+    branches: [exp/noetic-matrix-002-recovery]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  conditional-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile and run complete regression suite
+        run: |
+          python -m compileall -q noetic_engine experiments tests
+          python -m unittest discover -s tests -v
+      - name: Execute frozen source-conditioned persistence experiment
+        run: |
+          python -m experiments.matrix_003 --output evidence/matrix_003_all_cases.json > matrix_003_summary.json
+          python -m json.tool evidence/matrix_003_all_cases.json >/dev/null
+          python -m json.tool matrix_003_summary.json >/dev/null
+          cat matrix_003_summary.json
+      - name: Preserve full raw evidence on experiment branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/exp/noetic-matrix-003-conditional-repair'
+        run: |
+          mkdir -p results/matrix_003
+          gzip -n -9 -c evidence/matrix_003_all_cases.json >/tmp/matrix003-cases.json.gz
+          if test -f results/matrix_003/cases.json.gz; then
+            cmp -s results/matrix_003/cases.json.gz /tmp/matrix003-cases.json.gz || { echo 'Frozen cases mismatch'; exit 1; }
+            cmp -s results/matrix_003/aggregate.json matrix_003_summary.json || { echo 'Aggregate mismatch'; exit 1; }
+          else
+            cp /tmp/matrix003-cases.json.gz results/matrix_003/cases.json.gz
+            cp matrix_003_summary.json results/matrix_003/aggregate.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add results/matrix_003
+            git commit -m "results: archive MATRIX-003 full source-context trajectories"
+            git push origin HEAD:exp/noetic-matrix-003-conditional-repair
+          fi
+      - name: Upload raw cases and frozen protocol
+        uses: actions/upload-artifact@v4
+        with:
+          name: matrix-003-all-conditions-raw
+          path: |
+            evidence/matrix_003_all_cases.json
+            matrix_003_summary.json
+            experiments/fixtures/matrix_003_frozen_v01.json
+            experiments/PROTOCOL_MATRIX_003.md
+          retention-days: 90
+          if-no-files-found: error

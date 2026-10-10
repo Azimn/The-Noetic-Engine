@@ -7,6 +7,7 @@ from .egregore import record_claim, review_claim
 from .selfmodel import propose as propose_self, review as review_self
 from .oracle_guard import review as review_oracle_record
 from .development import consolidate, lesion_signature
+from .context_field import bind as context_bind, resolve as context_resolve
 from .neural_field import initialize as neural_initialize, load as neural_load, reinforce as neural_reinforce
 from .store import Store
 from .step import perform
@@ -41,6 +42,18 @@ class NoeticEngine:
 
     def pulse(self,seed=0,mode="wake"):
         return perform_pulse(self,seed,mode)
+
+    def bind_context(self,ident,origin,tendency,strength,kind="transient"):
+        if not self.config.conditional_context:
+            raise ValueError("conditional context is not enabled for this brain")
+        with self.store.tx():
+            context_bind(self.store,ident,origin,tendency,strength,kind)
+
+    def resolve_context(self,ident,origin):
+        if not self.config.conditional_context:
+            raise ValueError("conditional context is not enabled for this brain")
+        with self.store.tx():
+            context_resolve(self.store,ident,origin)
 
     def add_intention(self,ident,label,tendency,strength=1.):
         with self.store.tx():
@@ -123,6 +136,7 @@ class NoeticEngine:
           "social_claims":[dict(r) for r in db.db.execute("SELECT * FROM social_claims ORDER BY id")],
           "oracle_reviews":[dict(r) for r in db.db.execute("SELECT * FROM oracle_reviews ORDER BY id")],
           "configuration_digest":db.meta("config_digest"),
+          "environmental_context":[dict(r) for r in db.db.execute("SELECT * FROM world_context ORDER BY ident")],
           "neural_field":({"units":self.config.neural_units,
                            "updates":neural_load(db.db,self.config.subject_id)["updates"],
                            "outcomes":neural_load(db.db,self.config.subject_id)["outcomes"]}
