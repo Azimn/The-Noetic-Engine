@@ -36,5 +36,5 @@ def outcome(db,decision_id,reward,tick):
         import json
         if json.loads(e["payload"])["decision_id"]==decision_id:
             raise ValueError("duplicate outcome")
-    learn_from_outcome(db,r["action"],reward)
+    learn_from_outcome(db.db,r["action"],reward)
     db.event(tick,"outcome",{"decision_id":decision_id,"reward":reward})
