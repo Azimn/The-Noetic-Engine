@@ -1,0 +1,299 @@
+{
+  "schema": "noetic-matrix-004-v01",
+  "status": "synthetic objective-rule world; not human authored/adjudicated",
+  "seeds": [
+    11,
+    23,
+    37,
+    53,
+    71,
+    97
+  ],
+  "actions": [
+    "investigate",
+    "comfort",
+    "protect",
+    "withdraw",
+    "defer"
+  ],
+  "conditions": [
+    "full_contingent",
+    "no_recurrent_contingent",
+    "signed_only",
+    "no_intention_contingent",
+    "frozen_no_learning",
+    "static_heuristic"
+  ],
+  "training_action_exposure": [
+    "investigate",
+    "comfort",
+    "protect",
+    "withdraw",
+    "defer"
+  ],
+  "signal_names": [
+    "hazard",
+    "reliability",
+    "distress",
+    "evidence_gap"
+  ],
+  "training": [
+    {
+      "id": "t01",
+      "scene": "lantern_room",
+      "hazard": 1,
+      "reliability": 1,
+      "distress": 0,
+      "evidence_gap": 0
+    },
+    {
+      "id": "t02",
+      "scene": "coal_tram",
+      "hazard": 1,
+      "reliability": 1,
+      "distress": 1,
+      "evidence_gap": 0
+    },
+    {
+      "id": "t03",
+      "scene": "canal_bridge",
+      "hazard": 1,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t04",
+      "scene": "winter_market",
+      "hazard": 1,
+      "reliability": 0,
+      "distress": 1,
+      "evidence_gap": 0
+    },
+    {
+      "id": "t05",
+      "scene": "private_letter",
+      "hazard": 0,
+      "reliability": 1,
+      "distress": 1,
+      "evidence_gap": 0
+    },
+    {
+      "id": "t06",
+      "scene": "sewing_room",
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 1,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t07",
+      "scene": "book_inventory",
+      "hazard": 0,
+      "reliability": 1,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t08",
+      "scene": "apothecary_label",
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t09",
+      "scene": "museum_evening",
+      "hazard": 0,
+      "reliability": 1,
+      "distress": 0,
+      "evidence_gap": 0
+    },
+    {
+      "id": "t10",
+      "scene": "quiet_observatory",
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 0
+    },
+    {
+      "id": "t11",
+      "scene": "river_sluice",
+      "hazard": 1,
+      "reliability": 1,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t12",
+      "scene": "steam_pipe",
+      "hazard": 1,
+      "reliability": 1,
+      "distress": 1,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t13",
+      "scene": "harbor_whistle",
+      "hazard": 1,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 0
+    },
+    {
+      "id": "t14",
+      "scene": "tower_bell",
+      "hazard": 1,
+      "reliability": 0,
+      "distress": 1,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t15",
+      "scene": "railway_platform",
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 1,
+      "evidence_gap": 0
+    },
+    {
+      "id": "t16",
+      "scene": "glasshouse_notes",
+      "hazard": 0,
+      "reliability": 1,
+      "distress": 1,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t17",
+      "scene": "empty_ward",
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t18",
+      "scene": "mechanical_catalog",
+      "hazard": 0,
+      "reliability": 1,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "t19",
+      "scene": "silent_ferry",
+      "hazard": 0,
+      "reliability": 1,
+      "distress": 0,
+      "evidence_gap": 0
+    },
+    {
+      "id": "t20",
+      "scene": "deserted_study",
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 0
+    }
+  ],
+  "heldout": [
+    {
+      "id": "h01",
+      "scene": "frozen_harbor_winch",
+      "hazard": 1,
+      "reliability": 1,
+      "distress": 1,
+      "evidence_gap": 1
+    },
+    {
+      "id": "h02",
+      "scene": "uncertain_telegraph",
+      "hazard": 1,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "h03",
+      "scene": "anxious_stranger",
+      "hazard": 0,
+      "reliability": 1,
+      "distress": 1,
+      "evidence_gap": 0
+    },
+    {
+      "id": "h04",
+      "scene": "missing_blueprint",
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "h05",
+      "scene": "settled_library",
+      "hazard": 0,
+      "reliability": 1,
+      "distress": 0,
+      "evidence_gap": 0
+    },
+    {
+      "id": "h06",
+      "scene": "river_floodgate",
+      "hazard": 1,
+      "reliability": 1,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "h07",
+      "scene": "rumored_hazard",
+      "hazard": 1,
+      "reliability": 0,
+      "distress": 1,
+      "evidence_gap": 0
+    },
+    {
+      "id": "h08",
+      "scene": "injured_messenger",
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 1,
+      "evidence_gap": 1
+    },
+    {
+      "id": "h09",
+      "scene": "distant_observer",
+      "hazard": 0,
+      "reliability": 1,
+      "distress": 0,
+      "evidence_gap": 1
+    },
+    {
+      "id": "h10",
+      "scene": "safe_laboratory",
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 0
+    }
+  ],
+  "text_templates": {
+    "training": "The {scene} case presents a {hazard_status}; witness reliability is {reliability_status}; distress is {distress_status}; the documentary gap is {gap_status}.",
+    "heldout": "At {scene}, a separate inspector reports hazard={hazard_status}, corroboration={reliability_status}, interpersonal distress={distress_status}, outstanding records={gap_status}.",
+    "outcome": "A distinct simulator record for {scene} establishes that a tested action had an externally evaluated consequence."
+  },
+  "control_signals": {
+    "post_outcome_none": {
+      "hazard": 0,
+      "reliability": 0,
+      "distress": 0,
+      "evidence_gap": 0
+    }
+  },
+  "outcome_recording": "simulation outcome is calculated by a deterministic, separately defined world adjudicator; human adjudication remains missing",
+  "safety": "no human mindreading, no production Pretorius data, no copyrighted source datasets"
+}

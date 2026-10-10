@@ -8,6 +8,7 @@ from .selfmodel import propose as propose_self, review as review_self
 from .oracle_guard import review as review_oracle_record
 from .development import consolidate, lesion_signature
 from .context_field import bind as context_bind, resolve as context_resolve
+from .consequence_head import learn as choice_learn
 from .neural_field import initialize as neural_initialize, load as neural_load, reinforce as neural_reinforce
 from .store import Store
 from .step import perform
@@ -79,14 +80,17 @@ class NoeticEngine:
             if not r or r["subject"]!=self.config.subject_id or r["class"]!="lived_observed":
                 raise ValueError("outcome authority source fails provenance check")
         with self.store.tx():
-            outcome(self.store,decision_id,reward,int(self.store.meta("tick")))
-            if self.config.developmental:
+            outcome(self.store,decision_id,reward,int(self.store.meta("tick")),
+                    update_legacy=self.config.outcome_learning_enabled)
+            if self.config.consequence_head and self.config.outcome_learning_enabled:
+                choice_learn(self.store,self.config,decision_id,reward,source_origin)
+            if self.config.outcome_learning_enabled and self.config.developmental:
                 row=self.store.db.execute("SELECT action FROM decisions WHERE id=?",
                                           (decision_id,)).fetchone()
                 changed=consolidate(self.store.db,row["action"],reward,decision_id,authority)
                 self.store.event(int(self.store.meta("tick")),"developmental_consolidation",
                                  {**changed,"source_origin":source_origin})
-            if self.config.neural_field:
+            if self.config.outcome_learning_enabled and self.config.neural_field:
                 changed_neural=neural_reinforce(self.store.db,self.config.subject_id,reward)
                 self.store.event(int(self.store.meta("tick")),"neural_reinforcement",
                                  {"decision_id":decision_id,**changed_neural})

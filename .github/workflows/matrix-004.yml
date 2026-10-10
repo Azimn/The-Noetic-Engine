@@ -1,0 +1,59 @@
+name: Noetic MATRIX-004 Consequential World
+
+on:
+  push:
+    branches: [exp/noetic-matrix-004-consequence-learning]
+  pull_request:
+    branches: [exp/noetic-matrix-003-conditional-repair]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  world-learning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile and run complete regression suite
+        run: |
+          python -m compileall -q noetic_engine experiments tests
+          python -m unittest discover -s tests -v
+      - name: Execute locked consequential world matrix
+        run: |
+          python -m experiments.matrix_004 --output evidence/matrix_004_complete_cases.json > matrix_004_summary.json
+          python -m json.tool evidence/matrix_004_complete_cases.json >/dev/null
+          python -m json.tool matrix_004_summary.json >/dev/null
+          cat matrix_004_summary.json
+      - name: Permanently archive first successful raw result
+        if: github.event_name == 'push' && github.ref == 'refs/heads/exp/noetic-matrix-004-consequence-learning'
+        run: |
+          mkdir -p results/matrix_004
+          gzip -n -9 -c evidence/matrix_004_complete_cases.json >/tmp/matrix004.json.gz
+          if test -f results/matrix_004/cases.json.gz; then
+            python -m experiments.compare_matrix_004_archives results/matrix_004/cases.json.gz evidence/matrix_004_complete_cases.json
+            python -m experiments.compare_matrix_004_archives results/matrix_004/aggregate.json matrix_004_summary.json
+          else
+            cp /tmp/matrix004.json.gz results/matrix_004/cases.json.gz
+            cp matrix_004_summary.json results/matrix_004/aggregate.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add results/matrix_004
+            git commit -m "results: archive full MATRIX-004 source and policy cases"
+            git push origin HEAD:exp/noetic-matrix-004-consequence-learning
+          fi
+      - name: Publish frozen inputs and complete per-case evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: noetic-matrix-004-full-raw
+          path: |
+            evidence/matrix_004_complete_cases.json
+            matrix_004_summary.json
+            experiments/fixtures/matrix_004_world_v01.json
+            experiments/PROTOCOL_MATRIX_004.md
+          retention-days: 90
+          if-no-files-found: error
