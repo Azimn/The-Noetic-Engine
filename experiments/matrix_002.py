@@ -150,8 +150,8 @@ def analyze(forks):
     end=perturb_distance[-1]
     learning_scores=[l1(a["scores"],b["scores"]) for a,b in zip(positive[-4:],negative[-4:])]
     positive_zero=[l1(a["scores"],b["scores"]) for a,b in zip(positive[-4:],zero[-4:])]
-    target_positive={k:v["target"] for k,v in forks["reward_positive"]["field"].items()}
-    target_negative={k:v["target"] for k,v in forks["reward_negative"]["field"].items()}
+    target_positive={k:v["template"] for k,v in forks["reward_positive"]["field"].items()}
+    target_negative={k:v["template"] for k,v in forks["reward_negative"]["field"].items()}
     dev_positive={k:v["target"] for k,v in forks["reward_positive"]["developmental"].items()}
     dev_negative={k:v["target"] for k,v in forks["reward_negative"]["developmental"].items()}
     return {
