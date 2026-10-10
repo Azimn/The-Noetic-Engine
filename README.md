@@ -39,6 +39,22 @@ python -m noetic_engine --profile full --db full.db pulse --mode sleep --seed 7
 
 Development deliberately begins with explicit inspectable operators. Later neural or field implementations must demonstrate causal improvement against these baselines.
 
+## Optional local-model rendering
+
+`noetic_engine.local_renderers` contains `OllamaRenderer` and
+`LocalChatRenderer`. Both accept the immutable `DecisionBrief` prepared by
+`brief_from_decision(engine, decision_id)`, connect only to loopback servers,
+and return untrusted display text. They cannot write autobiographical state.
+Actual LLM model-switch consistency is **not yet tested**.
+
+```python
+from noetic_engine.renderer import brief_from_decision
+from noetic_engine.local_renderers import OllamaRenderer
+
+# Given a validated NoeticEngine brain and an existing decision ID:
+# dialogue = OllamaRenderer("qwen3:1.5b").render(brief_from_decision(brain, decision_id))
+```
+
 ## License and citation
 
 No license is granted by this README. Manuscript is an unpublished conceptual preprint draft, **not peer reviewed**. Citations in the manuscript are linked to verified primary records.
