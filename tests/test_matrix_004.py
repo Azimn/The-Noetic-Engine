@@ -37,6 +37,8 @@ class TestConsequencePolicy(unittest.TestCase):
         chosen=r["state"]["choice_head"]["by_action"]
         self.assertEqual(r["action"],
                 sorted(chosen,key=lambda a:(-chosen[a]["total"],a))[0])
+        self.assertEqual({k:v["total"] for k,v in r["scores"].items()},
+                         {k:v["total"] for k,v in chosen.items()})
         self.assertTrue(self.brain.status()["verified_audit_hashes"])
 
     def test_outcome_source_required_and_single_use(self):
