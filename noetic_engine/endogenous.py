@@ -10,6 +10,7 @@ from .memory import retrieve
 from .oracle import propose
 from .dynamics import propagate,arbitrate
 from .development import advance
+from .context_field import apply as context_apply
 from .neural_field import propagate as neural_propagate
 
 def pulse(engine,seed=0,mode="wake"):
@@ -34,6 +35,8 @@ def pulse(engine,seed=0,mode="wake"):
                 db.db.execute("UPDATE affect SET value=? WHERE name=?",
                     (round(clip(r["value"]*0.93,0,1),9),r["name"]))
         state=propagate(db.db,cfg,"environment","")
+        if cfg.conditional_context:
+            state=context_apply(db,cfg,state,tick)
         if cfg.developmental:
             state=advance(db.db,state,tick)
         if cfg.neural_field:
