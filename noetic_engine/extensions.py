@@ -40,6 +40,24 @@ def install(store):
       FOREIGN KEY(hypothesis_id) REFERENCES self_hypotheses(id));
     CREATE TRIGGER IF NOT EXISTS self_reviews_immutable BEFORE UPDATE ON self_reviews
       BEGIN SELECT RAISE(ABORT,'immutable self review'); END;
+    CREATE TABLE IF NOT EXISTS choice_weights(
+      action TEXT NOT NULL, feature TEXT NOT NULL, weight REAL NOT NULL,
+      PRIMARY KEY(action,feature));
+    CREATE TABLE IF NOT EXISTS choice_decisions(
+      decision_id INTEGER PRIMARY KEY, tick INTEGER NOT NULL,
+      origin TEXT NOT NULL, action TEXT NOT NULL, feature_json TEXT NOT NULL,
+      score_json TEXT NOT NULL,digest TEXT NOT NULL,
+      FOREIGN KEY(decision_id) REFERENCES decisions(id),
+      FOREIGN KEY(origin) REFERENCES observations(origin));
+    CREATE TRIGGER IF NOT EXISTS choice_decisions_no_update
+      BEFORE UPDATE ON choice_decisions BEGIN SELECT RAISE(ABORT,'immutable choice decision'); END;
+    CREATE TABLE IF NOT EXISTS choice_feedback(
+      decision_id INTEGER PRIMARY KEY, origin TEXT NOT NULL,
+      reward REAL NOT NULL, update_json TEXT NOT NULL,digest TEXT NOT NULL,
+      FOREIGN KEY(decision_id) REFERENCES choice_decisions(decision_id),
+      FOREIGN KEY(origin) REFERENCES observations(origin));
+    CREATE TRIGGER IF NOT EXISTS choice_feedback_no_update
+      BEFORE UPDATE ON choice_feedback BEGIN SELECT RAISE(ABORT,'immutable choice feedback'); END;
     CREATE TABLE IF NOT EXISTS world_context(
       ident TEXT PRIMARY KEY,origin TEXT NOT NULL,tendency TEXT NOT NULL,
       strength REAL NOT NULL,kind TEXT NOT NULL,start_tick INTEGER NOT NULL,
@@ -60,13 +78,13 @@ def install(store):
     """)
     with store.tx():
         version=store.meta("noetic_extension_schema")
-        if version not in (None,"1","2","3","4","5"):
+        if version not in (None,"1","2","3","4","5","6"):
             raise ValueError("incompatible Noetic extension schema")
         # Additive migration for any prior v0.2 branch database.
         existing={r[1] for r in store.db.execute("PRAGMA table_info(social_claims)")}
         if "quotation" not in existing:
             store.db.execute("ALTER TABLE social_claims ADD COLUMN quotation TEXT NOT NULL DEFAULT ''")
-        store.put("noetic_extension_schema","5")
+        store.put("noetic_extension_schema","6")
         for name in ("inquiry","care","caution"):
             store.db.execute("""INSERT OR IGNORE INTO developmental_state
               VALUES(?,0,0,0,0)""",(name,))
