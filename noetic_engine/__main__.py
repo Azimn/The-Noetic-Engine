@@ -1,13 +1,15 @@
 """Command-line chassis for the auditable Noetic Engine."""
 import argparse,json,sys
 from .engine import NoeticEngine
-from .models import Observation,EvidenceClass
+from .models import Observation,EvidenceClass,Configuration
 
 def main(argv=None):
     p=argparse.ArgumentParser(description="Noetic Engine research harness")
     p.add_argument("--db",default="noetic.sqlite")
+    p.add_argument("--profile",choices=("baseline","full"),default="baseline")
     sub=p.add_subparsers(dest="command",required=True)
     sub.add_parser("status");sub.add_parser("demo")
+    cycle=sub.add_parser("pulse");cycle.add_argument("--mode",choices=("wake","sleep"),default="wake");cycle.add_argument("--seed",type=int,default=0)
     run=sub.add_parser("step")
     run.add_argument("origin_id");run.add_argument("text")
     run.add_argument("--actor",default="environment")
