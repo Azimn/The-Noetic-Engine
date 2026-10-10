@@ -1,0 +1,25 @@
+name: Noetic Engine CI
+on:
+  push:
+    branches: [main, feat/noetic-field-foundation]
+  pull_request:
+    branches: [main]
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile code
+        run: python -m compileall -q noetic_engine tests
+      - name: Run integrated regression suite
+        run: python -m unittest discover -s tests -v
+      - name: Smoke test full CLI
+        run: |
+          python -m noetic_engine --db /tmp/noetic-ci.sqlite demo >/tmp/noetic-demo.json
+          python -m noetic_engine --db /tmp/noetic-ci.sqlite status
