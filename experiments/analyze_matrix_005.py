@@ -31,8 +31,6 @@ def analyze(report):
             all_episodes=row["test_episodes"]
             commands=[act["action"] for ep in all_episodes for act in ep["actions"]]
             kinds=collections.Counter(action_category(a) for a in commands)
-            repeats=sum(commands[i]==commands[i-1] for ep in all_episodes
-                for i in [] )  # Repetitions are counted per episode below.
             repeats=sum(sum(ep["actions"][i]["action"]==ep["actions"][i-1]["action"]
                         for i in range(1,len(ep["actions"]))) for ep in all_episodes)
             margins=[]
