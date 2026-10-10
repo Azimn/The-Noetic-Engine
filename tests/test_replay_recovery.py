@@ -20,9 +20,9 @@ class Reproducibility(unittest.TestCase):
 
     def run_history(self):
         self.brain.add_intention("protect","Protect Sarah","care",0.8)
-        first=self.brain.step(observed("a",relationship_delta=0.5,
+        first=self.brain.step(observed("a",text="Sarah says I trust you about the laboratory dilemma",relationship_delta=0.5,
                                          affect_delta={"affiliation":0.8}),seed=6)
-        social=self.brain.add_social_claim("a","sarah",OWNER,"trusts",1,0.9,"direct_quote")
+        social=self.brain.add_social_claim("a","sarah",OWNER,"trusts",1,0.9,"direct_quote","I trust you")
         self.brain.review_social_claim(social,"reviewer","admitted_for_policy")
         self_h=self.brain.propose_self_hypothesis("a","values","care",0.7,0.8)
         self.brain.review_self_hypothesis(self_h,"reviewer","corroborated_for_policy")
