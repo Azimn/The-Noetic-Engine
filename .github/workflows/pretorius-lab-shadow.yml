@@ -1,0 +1,57 @@
+name: Noetic / Pretorius Laboratory Shadow
+
+on:
+  push:
+    branches: [exp/noetic-pretorius-laboratory-shadow]
+  pull_request:
+    branches: [exp/noetic-matrix-005-textworldexpress]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lab-continuity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact pinned authoritative laboratory source
+        run: |
+          python -m pip install "git+https://github.com/Azimn/Pretorius-Laboratory.git@93d19671f7666b2996e6fcad211c5e6509336466"
+          python -m pip show pretorius-laboratory
+      - name: Verify all original Noetic and cross-repo integration tests
+        run: |
+          python -m compileall -q noetic_engine experiments tests
+          python -m unittest discover -s tests -v
+      - name: Execute real persistent-lab / cognitive-restart trial
+        run: |
+          mkdir -p evidence
+          python -m experiments.lab_shadow_trial --output evidence/lab_shadow_v01.json | tee evidence/lab_shadow_summary.json
+          python -m json.tool evidence/lab_shadow_v01.json >/dev/null
+      - name: Archive first verified research rehearsal
+        if: github.event_name == 'push' && github.ref == 'refs/heads/exp/noetic-pretorius-laboratory-shadow'
+        run: |
+          mkdir -p results/lab_shadow
+          if test -f results/lab_shadow/first_executed.json; then
+            echo "Earlier world-epoch-specific rehearsal retained; new runs have distinct UUIDs and event timestamps."
+          else
+            cp evidence/lab_shadow_v01.json results/lab_shadow/first_executed.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add results/lab_shadow
+            git commit -m "results: preserve first verified lab shadow continuity trial"
+            git push origin HEAD:exp/noetic-pretorius-laboratory-shadow
+          fi
+      - name: Upload full provenance-bearing rehearsal result
+        uses: actions/upload-artifact@v4
+        with:
+          name: noetic-laboratory-shadow-permanence-cases
+          path: |
+            evidence/lab_shadow_v01.json
+            evidence/lab_shadow_summary.json
+          retention-days: 90
+          if-no-files-found: error
