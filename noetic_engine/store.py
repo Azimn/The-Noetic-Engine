@@ -15,6 +15,10 @@ class Store:
         CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY,v TEXT);
         CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY,tick INT,kind TEXT,payload TEXT,hash TEXT);
         CREATE TABLE IF NOT EXISTS observations(id INTEGER PRIMARY KEY,tick INT,origin TEXT UNIQUE,subject TEXT,actor TEXT,source TEXT,class TEXT,text TEXT,hash TEXT);
+        CREATE TRIGGER IF NOT EXISTS protect_event_update BEFORE UPDATE ON events BEGIN SELECT RAISE(ABORT,'event immutable'); END;
+        CREATE TRIGGER IF NOT EXISTS protect_event_delete BEFORE DELETE ON events BEGIN SELECT RAISE(ABORT,'event immutable'); END;
+        CREATE TRIGGER IF NOT EXISTS protect_observation_update BEFORE UPDATE ON observations BEGIN SELECT RAISE(ABORT,'observation immutable'); END;
+        CREATE TRIGGER IF NOT EXISTS protect_observation_delete BEFORE DELETE ON observations BEGIN SELECT RAISE(ABORT,'observation immutable'); END;
         CREATE TABLE IF NOT EXISTS intentions(id TEXT PRIMARY KEY,label TEXT,tendency TEXT,strength REAL,tension REAL,status TEXT);
         CREATE TABLE IF NOT EXISTS relations(actor TEXT PRIMARY KEY,trust REAL,confidence REAL,viewpoint TEXT,source_id INT);
         CREATE TABLE IF NOT EXISTS affect(name TEXT PRIMARY KEY,value REAL);
@@ -51,5 +55,6 @@ class Store:
         return {r[k]:r[v] for r in self.db.execute(f"SELECT {k},{v} FROM {table}")}
     def verify(self):
         return (all(digest(json.loads(r["payload"]))==r["hash"] for r in self.db.execute("SELECT payload,hash FROM events")) and
-                all(digest(json.loads(r["audit"]))==r["hash"] for r in self.db.execute("SELECT audit,hash FROM decisions")))
+                all(digest(json.loads(r["audit"]))==r["hash"] for r in self.db.execute("SELECT audit,hash FROM decisions")) and
+                all(digest({"origin_id":r["origin"],"subject_id":r["subject"],"actor_id":r["actor"],"evidence_class":r["class"],"source":r["source"],"text":r["text"]})==r["hash"] for r in self.db.execute("SELECT * FROM observations")))
     def close(self):self.db.close()
