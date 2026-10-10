@@ -69,9 +69,15 @@ def perform(engine,observation,allowed=None,seed=0):
         contextual=choice_choose(db.db,cfg,observation,tick,scores,actions)
         if contextual:
             action=contextual["selected"]
+            state["base_policy_scores"]=scores
             state["choice_head"]={"feature_basis":contextual["features"],
                                   "by_action":contextual["by_action"],
                                   "version":contextual["version"]}
+            # Top-level audit scores must describe the ACTUAL selected policy,
+            # not merely the pre-learning field's counterfactual scores.
+            scores={a:{"base":v["base"],"learned_value":v["value"],
+                       "learned_gain":v["gain"],"total":v["total"]}
+                    for a,v in contextual["by_action"].items()}
         audit={"tick":tick,"action":action,"scores":scores,"state":state,
                "observation_id":record_id,"origin_id":observation.origin_id,
                "memory_pointers":memories,"oracle":hypothesis,
