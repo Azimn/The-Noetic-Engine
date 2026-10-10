@@ -1,0 +1,106 @@
+{
+  "brain_memories_after_postrestart_read": 8,
+  "brain_memories_before_restart": 7,
+  "cognitive_ledger_verified": true,
+  "epistemic_level": "scripted_sandbox_bridge_not_autonomous_Pretorius_or_identity_validation",
+  "fork_world_epoch": "76486044-5c00-4135-add3-5f340fbbc31b",
+  "laboratory_backup_verified": true,
+  "laboratory_book_verified": true,
+  "laboratory_world_verified": true,
+  "limits": [
+    "All actions were scripted by test harness",
+    "Cognitive recall is sparse lexical retrieval, not semantic autobiographical verification",
+    "No model swap, environment-controlled agent, or human character adjudication",
+    "No Village projection, production cognition or autonomous character state was mutated",
+    "Receipt proves offered data, not a human or artificial subject experienced it"
+  ],
+  "memory_only_after_restart": {
+    "beaker_retrieval": [
+      {
+        "evidence_class": "lived_observed",
+        "lexical_score": 0.034483,
+        "origin_id": "lab-offer:after-beaker"
+      },
+      {
+        "evidence_class": "lived_observed",
+        "lexical_score": 0.033333,
+        "origin_id": "lab-offer:initial-beaker"
+      },
+      {
+        "evidence_class": "lived_observed",
+        "lexical_score": 0.015385,
+        "origin_id": "lab-offer:initial-room"
+      }
+    ],
+    "book_retrieval_count": 1,
+    "page_one_offered_and_consumed": true,
+    "page_two_absent_until_offered": true
+  },
+  "parent_unmodified": true,
+  "parent_world_epoch": "8ff2b809-eb3b-4ca3-9fc6-dac61cf04f1f",
+  "physical_events": [
+    {
+      "action": {
+        "object_id": "beaker:001",
+        "op": "break"
+      },
+      "base_revision": 0,
+      "committed_revision": 1,
+      "event_hash": "e37d1eb157b8b4ac913d1777d89b2a6a24e71daa169c1ab99dc69674a13e03aa",
+      "event_id": "break-beaker",
+      "visibility": "research_private",
+      "world_epoch": "76486044-5c00-4135-add3-5f340fbbc31b"
+    },
+    {
+      "action": {
+        "object_id": "beaker:001",
+        "op": "collect"
+      },
+      "base_revision": 1,
+      "committed_revision": 2,
+      "event_hash": "3ccf40eeb2eadd81dff356d9a8f263653e9017f8b6e30c0bce6862e0e653ff64",
+      "event_id": "collect-fragments",
+      "visibility": "research_private",
+      "world_epoch": "76486044-5c00-4135-add3-5f340fbbc31b"
+    },
+    {
+      "action": {
+        "anchor_id": "floor:corner:nw",
+        "object_id": "beaker:001",
+        "op": "place"
+      },
+      "base_revision": 2,
+      "committed_revision": 3,
+      "event_hash": "e98e6ae716727c35fa6b0c551309415876cf87ed0443ba330bbfaedcffd5146e",
+      "event_id": "move-broken-beaker",
+      "visibility": "research_private",
+      "world_epoch": "76486044-5c00-4135-add3-5f340fbbc31b"
+    }
+  ],
+  "post_reboot_page_read": {
+    "edition_digest": "d1b99ac7caddf8df7709aa25dcd7e6bd707dff36c5619407284baa7004193ab5",
+    "origin": "lab-book-offer:book-page-two",
+    "page": 2,
+    "page_text": "On the following day the amber lamp was extinguished and the glass instrument cooled."
+  },
+  "protocol": "noetic-laboratory-shadow-v01",
+  "source": {
+    "repository": "Azimn/Pretorius-Laboratory",
+    "type": "version_pinned_authoritative_local_world"
+  },
+  "source_receipts_verified": true,
+  "world_bookmarks_after_restart": {
+    "copper-slip": 2
+  },
+  "world_persistent_beaker": {
+    "condition": "broken",
+    "id": "beaker:001",
+    "observed_qualitative_location": {
+      "anchor_id": "floor:corner:nw",
+      "fixture": "floor:sanctum",
+      "position": 1,
+      "room": "room:sanctum"
+    }
+  },
+  "world_restarted_at_revision": 3
+}
