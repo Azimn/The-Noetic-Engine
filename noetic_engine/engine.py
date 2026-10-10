@@ -1,5 +1,11 @@
 """Stable renderer-neutral brain port. All mutations are transactional."""
+from dataclasses import asdict
 from .models import Configuration
+from .store import digest
+from .extensions import install
+from .egregore import record_claim, review_claim
+from .oracle_guard import review as review_oracle_record
+from .development import consolidate, lesion_signature
 from .store import Store
 from .step import perform
 from .operations import intention,finish_intention,bind_symbol,outcome
@@ -10,6 +16,13 @@ class NoeticEngine:
         self.config=config or Configuration()
         self.config.validate()
         self.store=Store(path,self.config.subject_id)
+        install(self.store)
+        existing=self.store.meta("config_digest")
+        expected=digest(asdict(self.config))
+        if existing is not None and existing!=expected:
+            raise ValueError("configuration digest mismatch; clone state for experimental ablation")
+        if existing is None:
+            with self.store.tx():self.store.put("config_digest",expected)
         policy=self.store.meta("policy")
         if policy not in (None,self.config.policy_version):
             raise ValueError("policy version mismatch")
@@ -31,9 +44,43 @@ class NoeticEngine:
         with self.store.tx():
             bind_symbol(self.store,symbol,tendency,strength,origin_id,int(self.store.meta("tick")))
 
-    def record_outcome(self,decision_id,reward):
+    def record_outcome(self,decision_id,reward,authority="operator_scored",source_origin=None):
+        if authority not in ("operator_scored","adjudicated_outcome"):
+            raise ValueError("unsupported outcome authority")
+        if authority=="adjudicated_outcome":
+            if not source_origin:
+                raise ValueError("adjudicated outcomes need an independent lived source observation")
+            r=self.store.db.execute(
+                "SELECT subject,class FROM observations WHERE origin=?",
+                (source_origin,)).fetchone()
+            if not r or r["subject"]!=self.config.subject_id or r["class"]!="lived_observed":
+                raise ValueError("outcome authority source fails provenance check")
         with self.store.tx():
             outcome(self.store,decision_id,reward,int(self.store.meta("tick")))
+            if self.config.developmental:
+                row=self.store.db.execute("SELECT action FROM decisions WHERE id=?",
+                                          (decision_id,)).fetchone()
+                changed=consolidate(self.store.db,row["action"],reward,decision_id,authority)
+                self.store.event(int(self.store.meta("tick")),"developmental_consolidation",
+                                 {**changed,"source_origin":source_origin})
+            self.store.event(int(self.store.meta("tick")),"outcome_authority",
+                             {"decision_id":decision_id,"authority":authority,
+                              "source_origin":source_origin})
+
+    def add_social_claim(self,origin,attributed_actor,believed_subject,predicate,
+                         valence,confidence,epistemic):
+        with self.store.tx():
+            return record_claim(self.store,origin,attributed_actor,believed_subject,
+                                predicate,valence,confidence,epistemic)
+
+    def review_social_claim(self,claim_id,reviewer,disposition):
+        with self.store.tx():
+            review_claim(self.store,claim_id,reviewer,disposition)
+
+    def review_oracle(self,hypothesis_id,reviewer,disposition,justification):
+        with self.store.tx():
+            return review_oracle_record(self.store,hypothesis_id,reviewer,
+                                        disposition,justification)
 
     def recall(self,query,limit=4):
         return retrieve(self.store.db,query,limit)
@@ -49,7 +96,11 @@ class NoeticEngine:
           "relationships":[dict(r) for r in db.db.execute("SELECT * FROM relations ORDER BY actor")],
           "memories":db.db.execute("SELECT COUNT(*) FROM observations").fetchone()[0],
           "oracle_hypotheses":db.db.execute("SELECT COUNT(*) FROM oracle").fetchone()[0],
-          "verified_audit_hashes":db.verify()
+          "verified_audit_hashes":db.verify(),
+          "developmental_state":lesion_signature(db.db),
+          "social_claims":[dict(r) for r in db.db.execute("SELECT * FROM social_claims ORDER BY id")],
+          "oracle_reviews":[dict(r) for r in db.db.execute("SELECT * FROM oracle_reviews ORDER BY id")],
+          "configuration_digest":db.meta("config_digest")
         }
 
     def close(self):self.store.close()
