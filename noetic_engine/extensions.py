@@ -39,6 +39,8 @@ def install(store):
       FOREIGN KEY(hypothesis_id) REFERENCES self_hypotheses(id));
     CREATE TRIGGER IF NOT EXISTS self_reviews_immutable BEFORE UPDATE ON self_reviews
       BEGIN SELECT RAISE(ABORT,'immutable self review'); END;
+    CREATE TABLE IF NOT EXISTS recurrent_state(
+      subject_id TEXT PRIMARY KEY, payload TEXT NOT NULL, digest TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS field_snapshots(
       id INTEGER PRIMARY KEY, tick INTEGER NOT NULL, values_json TEXT NOT NULL,
       template_json TEXT NOT NULL, digest TEXT NOT NULL);
@@ -51,9 +53,9 @@ def install(store):
     """)
     with store.tx():
         version=store.meta("noetic_extension_schema")
-        if version not in (None,"1","2"):
+        if version not in (None,"1","2","3"):
             raise ValueError("incompatible Noetic extension schema")
-        store.put("noetic_extension_schema","2")
+        store.put("noetic_extension_schema","3")
         for name in ("inquiry","care","caution"):
             store.db.execute("""INSERT OR IGNORE INTO developmental_state
               VALUES(?,0,0,0,0)""",(name,))
