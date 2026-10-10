@@ -81,7 +81,7 @@ def replay_database(source_path,destination_path):
                         raise ValueError("outcome without attributed authority")
                     engine.record_outcome(p["decision_id"],p["reward"],
                         auth["authority"],auth.get("source_origin"))
-                elif kind in ("policy_decision","outcome_authority","developmental_consolidation"):
+                elif kind in ("policy_decision","outcome_authority","developmental_consolidation","neural_reinforcement"):
                     pass
                 else:
                     raise ValueError("unknown event kind in replay: "+kind)
