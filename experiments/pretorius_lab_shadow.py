@@ -125,14 +125,29 @@ class NoeticLaboratoryShadow:
         if result["delivery_class"] != "page_offered_to_interface_not_proof_of_reading":
             raise Conflict("not a source-attested page offering")
         self.books.verify()
+        # Link the page offering to the actual append-only book-event hash, not
+        # simply to a caller-chosen UUID or a successful catalog lookup.
+        with self.world._open() as db:
+            book_row=db.execute(
+                "SELECT payload,event_hash FROM books_events WHERE event_id=?",
+                (result["delivery_event_id"],),
+            ).fetchone()
+        if not book_row:
+            raise Conflict("book delivery lacks an immutable source event")
+        book_event=json.loads(book_row[0])
+        if (book_event["world_epoch"]!=self.world.verify()["world_epoch"] or
+            book_event["action"]!={"op":"read","book_id":book_id} or
+            book_event["page_receipt"]["page_digest"]!=digest(result["page_text"]) or
+            book_event["page_receipt"]["edition_digest"]!=result["content_digest"]):
+            raise Conflict("book delivery evidence does not match offered page")
         receipt={"book_id":result["book_id"],"edition_id":result["edition_id"],
                  "page":result["page"],"page_count":result["page_count"],
                  "page_text":result["page_text"],"content_digest":result["content_digest"],
                  "source_class":result["source_class"],
                  "delivery_event_id":result["delivery_event_id"]}
         delivery=self._deliver(
-            receipt_hash=result["delivery_event_id"],
-            world_epoch=self.world.verify()["world_epoch"],
+            receipt_hash=book_row[1],
+            world_epoch=book_event["world_epoch"],
             origin_id="lab-book-offer:"+result["delivery_event_id"],
             provenance="installed_book_page",payload=receipt)
         return delivery
