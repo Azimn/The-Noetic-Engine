@@ -81,7 +81,7 @@ def replay_database(source_path,destination_path):
                         raise ValueError("source observation predates replay-complete protocol")
                     o=Observation(p["origin_id"],p["subject_id"],p["text"],p["source"],
                         EvidenceClass(p["evidence_class"]),p["actor_id"],
-                        p["affect_delta"],p["relationship_delta"],p["cue"])
+                        p["affect_delta"],p["relationship_delta"],p["cue"],p.get("signals",{}))
                     result=engine.step(o,p["allowed"],p["seed"])
                     if result["observation_id"]!=p["record_id"]:
                         raise ValueError("observation sequence divergence")
@@ -91,7 +91,7 @@ def replay_database(source_path,destination_path):
                         raise ValueError("outcome without attributed authority")
                     engine.record_outcome(p["decision_id"],p["reward"],
                         auth["authority"],auth.get("source_origin"))
-                elif kind in ("policy_decision","outcome_authority","developmental_consolidation","neural_reinforcement"):
+                elif kind in ("policy_decision","outcome_authority","developmental_consolidation","neural_reinforcement","choice_feedback"):
                     pass
                 else:
                     raise ValueError("unknown event kind in replay: "+kind)
@@ -111,7 +111,8 @@ def replay_database(source_path,destination_path):
             tables=("meta","affect","field","intentions","relations","symbols",
                     "oracle","social_claims","social_reviews","oracle_reviews",
                     "self_hypotheses","self_reviews","developmental_state",
-                    "field_snapshots","recurrent_state","world_context")
+                    "field_snapshots","recurrent_state","world_context",
+                    "choice_weights","choice_decisions","choice_feedback")
             for table in tables:
                 left=[tuple(r) for r in source.execute(
                     "SELECT * FROM "+table+" ORDER BY rowid")]
