@@ -1,0 +1,41 @@
+name: Noetic longitudinal causal matrix
+
+on:
+  push:
+    branches: [exp/noetic-longitudinal-matrix-v01]
+  pull_request:
+    branches: [feat/noetic-full-architecture-v02]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile and run complete regression suite
+        run: |
+          python -m compileall -q noetic_engine experiments tests
+          python -m unittest discover -s tests -v
+      - name: Execute prespecified synthetic factorial experiment
+        run: |
+          python -m experiments.matrix_v01 --output evidence/matrix_v01_cases.json > evidence_summary.json
+          python -m json.tool evidence/matrix_v01_cases.json > /dev/null
+          python -m json.tool evidence_summary.json > /dev/null
+          cat evidence_summary.json
+      - name: Upload full case-level evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: noetic-matrix-v01-raw-cases
+          path: |
+            evidence/matrix_v01_cases.json
+            evidence_summary.json
+            experiments/fixtures/longitudinal_matrix_v01.json
+          if-no-files-found: error
+          retention-days: 90
