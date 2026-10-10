@@ -1,0 +1,32 @@
+name: MATRIX-005 External TextWorldExpress Gate
+on:
+  push:
+    branches: [exp/noetic-matrix-005-textworldexpress]
+  pull_request:
+    branches: [exp/noetic-matrix-004-consequence-learning]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  third-party-world:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install pinned external game engine
+        run: |
+          python -m pip install textworld-express==1.1.0
+          python -m pip show textworld-express
+      - name: External API and reward handshake (without game answers)
+        run: |
+          python -m experiments.external_textworld_smoke | tee /tmp/twe-smoke.json
+      - name: Noetic regression suite
+        run: |
+          python -m unittest discover -s tests -v
