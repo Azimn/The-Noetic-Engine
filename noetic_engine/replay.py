@@ -65,6 +65,12 @@ def replay_database(source_path,destination_path):
                     engine.review_self_hypothesis(p["id"],p["reviewer"],p["disposition"])
                 elif kind=="oracle_review":
                     engine.review_oracle(p["id"],p["reviewer"],p["disposition"],p["justification"])
+                elif kind=="pulse_input":
+                    if p["config_snapshot"]!=asdict(config):
+                        raise ValueError("pulse configuration changed")
+                    actual=engine.pulse(seed=p["seed"],mode=p["mode"])
+                    if actual["allowed_actions"]!=p["allowed"]:
+                        raise ValueError("endogenous action mask divergence")
                 elif kind=="observation":
                     needed=("affect_delta","relationship_delta","cue","seed","allowed","config_snapshot")
                     if any(k not in p for k in needed):
