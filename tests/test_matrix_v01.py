@@ -33,7 +33,7 @@ class MatrixProtocolTests(unittest.TestCase):
         neutral=run_trajectory(self.fixture,s,19,"neutral_symbol")
         for alternative in (no_oracle,neutral):
             comparison=difference(full,alternative)
-            self.assertEqual(comparison["mean_score_l1"],0)
+            self.assertEqual(comparison["score_l1_mean"],0)
             self.assertEqual(comparison["action_changes"],0)
         self.assertGreater(full["oracle_hypotheses"],no_oracle["oracle_hypotheses"])
 
@@ -41,7 +41,7 @@ class MatrixProtocolTests(unittest.TestCase):
         s=self.fixture["scenarios"][0]
         full=run_trajectory(self.fixture,s,41,"full")
         removed=run_trajectory(self.fixture,s,41,"no_intentions")
-        self.assertGreater(difference(full,removed)["mean_score_l1"],0)
+        self.assertGreater(difference(full,removed)["score_l1_mean"],0)
 
     def test_untrusted_claims_remain_unapproved(self):
         s=self.fixture["scenarios"][2]
