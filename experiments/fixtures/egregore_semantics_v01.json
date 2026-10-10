@@ -1,0 +1,130 @@
+{
+  "schema": "noetic-egregore-semantics-v01",
+  "label_provenance": "assistant-authored examples not independently annotated",
+  "subject": "pretorius_sandbox",
+  "actor": "speaker",
+  "claim_confidence": 0.9,
+  "cases": [
+    {
+      "id": "positive_trust",
+      "text": "The speaker said, 'I trust you with the records.'",
+      "quote": "I trust you with the records",
+      "predicate": "trusts",
+      "review_label": "supported_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "positive_fear",
+      "text": "The speaker said, 'I fear what you might do.'",
+      "quote": "I fear what you might do",
+      "predicate": "fears",
+      "review_label": "supported_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "positive_doubt",
+      "text": "The speaker said, 'I doubt your account of the evidence.'",
+      "quote": "I doubt your account of the evidence",
+      "predicate": "doubts",
+      "review_label": "supported_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "positive_respect",
+      "text": "The speaker said, 'I respect your work in this field.'",
+      "quote": "I respect your work in this field",
+      "predicate": "respects",
+      "review_label": "supported_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "negated_trust",
+      "text": "The speaker said, 'I do not trust you with these records.'",
+      "quote": "I do not trust you with these records",
+      "predicate": "trusts",
+      "review_label": "contradicted_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "negated_fear",
+      "text": "The speaker said, 'I do not fear you anymore.'",
+      "quote": "I do not fear you anymore",
+      "predicate": "fears",
+      "review_label": "contradicted_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "negated_doubt",
+      "text": "The speaker said, 'I have no reason to doubt you.'",
+      "quote": "I have no reason to doubt you",
+      "predicate": "doubts",
+      "review_label": "contradicted_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "past_only",
+      "text": "The speaker said, 'I trusted you once, but those days are over.'",
+      "quote": "I trusted you once, but those days are over",
+      "predicate": "trusts",
+      "review_label": "contradicted_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "different_target",
+      "text": "The speaker said, 'I trust the physician, not you.'",
+      "quote": "I trust the physician, not you",
+      "predicate": "trusts",
+      "review_label": "contradicted_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "literary_quote",
+      "text": "The speaker said, 'In my book the villain declares I trust you, but I never meant that myself.'",
+      "quote": "I trust you",
+      "predicate": "trusts",
+      "review_label": "contradicted_by_plain_reading",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "sarcasm",
+      "text": "The speaker said with obvious sarcasm, 'Oh, I trust you, as always.'",
+      "quote": "Oh, I trust you, as always",
+      "predicate": "trusts",
+      "review_label": "context_dependent",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "conditional",
+      "text": "The speaker said, 'If I trusted you, I would hand over the document.'",
+      "quote": "If I trusted you, I would hand over the document",
+      "predicate": "trusts",
+      "review_label": "context_dependent",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "hearsay",
+      "text": "A report alleges that the speaker privately fears Pretorius.",
+      "quote": "privately fears Pretorius",
+      "predicate": "fears",
+      "review_label": "not_directly_witnessed",
+      "kind": "third_party_claim"
+    },
+    {
+      "id": "invented_quote",
+      "text": "The speaker asked whether the archive was secure.",
+      "quote": "I trust you with the archive",
+      "predicate": "trusts",
+      "review_label": "source_span_absent",
+      "kind": "direct_quote"
+    },
+    {
+      "id": "wrong_speaker",
+      "text": "The speaker said, 'I respect your investigation.'",
+      "quote": "I respect your investigation",
+      "predicate": "respects",
+      "review_label": "speaker_mismatch",
+      "kind": "direct_quote",
+      "attributed_actor": "other_person"
+    }
+  ]
+}
