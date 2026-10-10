@@ -1,0 +1,57 @@
+name: Noetic Egregore semantic audit
+
+on:
+  push:
+    branches: [exp/noetic-egregore-semantic-audit]
+  pull_request:
+    branches: [feat/noetic-full-architecture-v02]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  attribution:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run full regression and adversarial source audit tests
+        run: |
+          python -m compileall -q noetic_engine experiments tests
+          python -m unittest discover -s tests -v
+      - name: Execute source-versus-semantics counterfactuals
+        run: |
+          python -m experiments.egregore_semantic_audit --output evidence/egregore_semantic_v01_cases.json > evidence_summary.json
+          python -m json.tool evidence/egregore_semantic_v01_cases.json > /dev/null
+          cat evidence_summary.json
+      - name: Permanently archive original cases, do not overwrite
+        if: github.event_name == 'push' && github.ref == 'refs/heads/exp/noetic-egregore-semantic-audit'
+        run: |
+          mkdir -p results/egregore_001
+          gzip -n -9 -c evidence/egregore_semantic_v01_cases.json > /tmp/egregore-cases.json.gz
+          if test -f results/egregore_001/cases.json.gz; then
+            cmp -s results/egregore_001/cases.json.gz /tmp/egregore-cases.json.gz || { echo "Frozen source-audit evidence mismatch"; exit 1; }
+            cmp -s results/egregore_001/aggregate.json evidence_summary.json || { echo "Summary conflict"; exit 1; }
+          else
+            cp /tmp/egregore-cases.json.gz results/egregore_001/cases.json.gz
+            cp evidence_summary.json results/egregore_001/aggregate.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add results/egregore_001
+            git commit -m "results: permanently preserve Egregore-001 adversarial raw source cases"
+            git push origin HEAD:exp/noetic-egregore-semantic-audit
+          fi
+      - name: Publish all original case outcomes
+        uses: actions/upload-artifact@v4
+        with:
+          name: egregore-semantic-audit-full-cases
+          path: |
+            evidence/egregore_semantic_v01_cases.json
+            evidence_summary.json
+            experiments/fixtures/egregore_semantics_v01.json
+          retention-days: 90
+          if-no-files-found: error
