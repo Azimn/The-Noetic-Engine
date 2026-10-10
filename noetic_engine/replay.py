@@ -102,6 +102,19 @@ def replay_database(source_path,destination_path):
                        (b["action"],b["audit"],b["hash"])
                        for a,b in zip(original,decisions)))
             if not match: raise ValueError("replayed history diverged from source")
+            # Derived mutable state is never assumed trustworthy because an
+            # attacker might change a projection without modifying event rows.
+            tables=("meta","affect","field","intentions","relations","symbols",
+                    "oracle","social_claims","social_reviews","oracle_reviews",
+                    "self_hypotheses","self_reviews","developmental_state",
+                    "field_snapshots","recurrent_state")
+            for table in tables:
+                left=[tuple(r) for r in source.execute(
+                    "SELECT * FROM "+table+" ORDER BY rowid")]
+                right=[tuple(r) for r in engine.store.db.execute(
+                    "SELECT * FROM "+table+" ORDER BY rowid")]
+                if left!=right:
+                    raise ValueError("replay projection divergence in "+table)
             if not engine.store.verify():raise ValueError("replay audit verification failed")
             return {"verified":True,"event_count":len(events),
                     "decision_count":len(original),"configuration":asdict(config),
