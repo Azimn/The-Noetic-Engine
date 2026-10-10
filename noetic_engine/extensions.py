@@ -28,6 +28,17 @@ def install(store):
     CREATE TABLE IF NOT EXISTS developmental_state(
       tendency TEXT PRIMARY KEY, target REAL NOT NULL, eligibility REAL NOT NULL,
       metaplasticity REAL NOT NULL, update_tick INTEGER NOT NULL);
+    CREATE TABLE IF NOT EXISTS self_hypotheses(
+      id INTEGER PRIMARY KEY, origin TEXT NOT NULL, predicate TEXT NOT NULL,
+      tendency TEXT NOT NULL, valence REAL NOT NULL, confidence REAL NOT NULL,
+      status TEXT NOT NULL DEFAULT 'provisional',
+      FOREIGN KEY(origin) REFERENCES observations(origin));
+    CREATE TABLE IF NOT EXISTS self_reviews(
+      id INTEGER PRIMARY KEY, hypothesis_id INTEGER NOT NULL,
+      reviewer TEXT NOT NULL, disposition TEXT NOT NULL, tick INTEGER NOT NULL,
+      FOREIGN KEY(hypothesis_id) REFERENCES self_hypotheses(id));
+    CREATE TRIGGER IF NOT EXISTS self_reviews_immutable BEFORE UPDATE ON self_reviews
+      BEGIN SELECT RAISE(ABORT,'immutable self review'); END;
     CREATE TABLE IF NOT EXISTS field_snapshots(
       id INTEGER PRIMARY KEY, tick INTEGER NOT NULL, values_json TEXT NOT NULL,
       template_json TEXT NOT NULL, digest TEXT NOT NULL);
@@ -40,9 +51,9 @@ def install(store):
     """)
     with store.tx():
         version=store.meta("noetic_extension_schema")
-        if version not in (None,"1"):
+        if version not in (None,"1","2"):
             raise ValueError("incompatible Noetic extension schema")
-        store.put("noetic_extension_schema","1")
+        store.put("noetic_extension_schema","2")
         for name in ("inquiry","care","caution"):
             store.db.execute("""INSERT OR IGNORE INTO developmental_state
               VALUES(?,0,0,0,0)""",(name,))
