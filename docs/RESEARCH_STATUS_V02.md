@@ -24,9 +24,9 @@ operation, not long-term identity performance.
 
 The donor recurrent system is a **synthetic seeded sparse network**, not a
 trained neural phenotype, FlyWire connectome, living neural tissue, or
-mechanism demonstrated to improve identity. No pretrained model adapter is
-present. Diagnostic renderers are not evidence of stable behavior after
-switching genuine LLM families.
+mechanism demonstrated to improve identity. Optional localhost-only Ollama and chat-completions presentation adapters now exist.
+Their transports are mocked in CI; no real model-family continuity experiment
+has been performed. These adapters are not production Pretorius integration.
 
 ## Tests and limitations
 
