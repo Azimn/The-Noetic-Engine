@@ -10,6 +10,7 @@ from .development import consolidate, lesion_signature
 from .neural_field import initialize as neural_initialize, load as neural_load, reinforce as neural_reinforce
 from .store import Store
 from .step import perform
+from .endogenous import pulse as perform_pulse
 from .operations import intention,finish_intention,bind_symbol,outcome
 from .memory import retrieve
 
@@ -37,6 +38,9 @@ class NoeticEngine:
 
     def step(self,observation,allowed=None,seed=0):
         return perform(self,observation,allowed,seed)
+
+    def pulse(self,seed=0,mode="wake"):
+        return perform_pulse(self,seed,mode)
 
     def add_intention(self,ident,label,tendency,strength=1.):
         with self.store.tx():
