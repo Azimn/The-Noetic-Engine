@@ -82,10 +82,10 @@ class NoeticEngine:
                               "source_origin":source_origin})
 
     def add_social_claim(self,origin,attributed_actor,believed_subject,predicate,
-                         valence,confidence,epistemic):
+                         valence,confidence,epistemic,quotation=None):
         with self.store.tx():
             return record_claim(self.store,origin,attributed_actor,believed_subject,
-                                predicate,valence,confidence,epistemic)
+                                predicate,valence,confidence,epistemic,quotation)
 
     def review_social_claim(self,claim_id,reviewer,disposition):
         with self.store.tx():
