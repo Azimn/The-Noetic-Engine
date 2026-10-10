@@ -57,6 +57,12 @@ def replay_database(source_path,destination_path):
                     if actual!=p["id"]:raise ValueError("social claim ID divergence")
                 elif kind=="social_claim_reviewed":
                     engine.review_social_claim(p["id"],p["reviewer"],p["disposition"])
+                elif kind=="self_hypothesis":
+                    actual=engine.propose_self_hypothesis(p["origin"],p["predicate"],
+                        p["tendency"],p["valence"],p["confidence"])
+                    if actual!=p["id"]:raise ValueError("self hypothesis ID divergence")
+                elif kind=="self_review":
+                    engine.review_self_hypothesis(p["id"],p["reviewer"],p["disposition"])
                 elif kind=="oracle_review":
                     engine.review_oracle(p["id"],p["reviewer"],p["disposition"],p["justification"])
                 elif kind=="observation":
