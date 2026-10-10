@@ -2,6 +2,7 @@
 from dataclasses import asdict
 from .models import ACTIONS, clip
 from .development import advance
+from .context_field import apply as context_apply
 from .neural_field import propagate as neural_propagate
 from .store import serial,digest
 from .memory import retrieve
@@ -55,6 +56,8 @@ def perform(engine,observation,allowed=None,seed=0):
         memories=[x for x in retrieve(db.db,observation.text) if x["id"]!=record_id]
         hypothesis=propose(db.db,tick,seed,memories) if cfg.oracle else None
         state=propagate(db.db,cfg,observation.actor_id,observation.cue)
+        if cfg.conditional_context:
+            state=context_apply(db,cfg,state,tick)
         if cfg.developmental:
             state=advance(db.db,state,tick)
         if cfg.neural_field:
