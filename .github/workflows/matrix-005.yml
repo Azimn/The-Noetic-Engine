@@ -53,6 +53,11 @@ jobs:
             git commit -m "results: archive external TextWorldExpress MATRIX-005 cases"
             git push origin HEAD:exp/noetic-matrix-005-textworldexpress
           fi
+      - name: Analyze original immutable case-level traces
+        run: |
+          mkdir -p evidence
+          python -m experiments.analyze_matrix_005 --raw results/matrix_005/cases.json.gz --output evidence/matrix005_diagnosis.json | tee evidence/matrix005_diagnosis_summary.json
+          python -m json.tool evidence/matrix005_diagnosis.json >/dev/null
       - name: Upload full per-command evidence
         uses: actions/upload-artifact@v4
         with:
@@ -60,6 +65,8 @@ jobs:
           path: |
             evidence/matrix005_all_cases.json
             evidence/matrix005_summary.json
+            evidence/matrix005_diagnosis.json
+            evidence/matrix005_diagnosis_summary.json
             experiments/PROTOCOL_MATRIX_005.md
           retention-days: 90
           if-no-files-found: error
