@@ -1,0 +1,86 @@
+{
+  "schema": "noetic-matrix-003-v01",
+  "status": "Frozen synthetic study; no human gold labels, no cognitive validation",
+  "seeds": [
+    13,
+    29,
+    47,
+    83,
+    131,
+    173,
+    239,
+    307
+  ],
+  "profiles": [
+    "conditional",
+    "drive_only",
+    "legacy_v02"
+  ],
+  "branches": [
+    "no_hazard",
+    "transient",
+    "persistent",
+    "resolved",
+    "revised"
+  ],
+  "cycles": 12,
+  "resolution_after": 4,
+  "scenario": [
+    {
+      "id": "salt_marsh_relay",
+      "actor": "signal_keeper",
+      "prelude": "The signal keeper explains how a remote marsh relay has worked for years.",
+      "event": "A report arrives about a possible fault in the marsh signal circuit.",
+      "clearance": "An inspection report describes the signal circuit after repair.",
+      "duty": "care",
+      "initial_affect": {
+        "affiliation": 0.55,
+        "curiosity": 0.25
+      },
+      "hazard_tendency": "caution",
+      "source_strength": 0.7
+    },
+    {
+      "id": "glasshouse_contamination",
+      "actor": "gardener",
+      "prelude": "The gardener describes the rules for protecting a rare botanical collection.",
+      "event": "A report arrives about possible contamination of the glasshouse ventilation.",
+      "clearance": "The glasshouse keeper files an inspection of the cleaned vents.",
+      "duty": "caution",
+      "initial_affect": {
+        "curiosity": 0.48,
+        "threat": 0.1
+      },
+      "hazard_tendency": "caution",
+      "source_strength": 0.7
+    },
+    {
+      "id": "observatory_frost",
+      "actor": "astronomer",
+      "prelude": "The astronomer describes the method for checking a fragile mirror at dawn.",
+      "event": "A report arrives about ice forming on the observatory assembly.",
+      "clearance": "A technician files an inspection after the mirror's heaters are repaired.",
+      "duty": "inquiry",
+      "initial_affect": {
+        "curiosity": 0.65,
+        "affiliation": 0.2
+      },
+      "hazard_tendency": "caution",
+      "source_strength": 0.7
+    },
+    {
+      "id": "museum_floor",
+      "actor": "curator",
+      "prelude": "The curator explains the responsibility to protect the museum's visitors and artifacts.",
+      "event": "A report arrives about the stability of an upper exhibition floor.",
+      "clearance": "The curator records the structural engineer's return inspection.",
+      "duty": "care",
+      "initial_affect": {
+        "affiliation": 0.45,
+        "curiosity": 0.35
+      },
+      "hazard_tendency": "caution",
+      "source_strength": 0.7
+    }
+  ]
+}
