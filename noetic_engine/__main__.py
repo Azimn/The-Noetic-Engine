@@ -26,8 +26,12 @@ def main(argv=None):
     symbol=sub.add_parser("bind");symbol.add_argument("symbol");symbol.add_argument("tendency");symbol.add_argument("source_origin")
     args=p.parse_args(argv)
     try:
-        with NoeticEngine(args.db) as brain:
+        profile=(Configuration() if args.profile=="baseline" else
+            Configuration(developmental=True,egregore=True,self_model=True,
+                          neural_field=True,policy_version="noetic-v0.2-full"))
+        with NoeticEngine(args.db,profile) as brain:
             if args.command=="status":result=brain.status()
+            elif args.command=="pulse":result=brain.pulse(seed=args.seed,mode=args.mode)
             elif args.command=="intend":
                 brain.add_intention(args.id,args.label,args.tendency);result=brain.status()
             elif args.command=="resolve":
