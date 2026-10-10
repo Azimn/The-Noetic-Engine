@@ -5,8 +5,12 @@ a transport for tests. Both transports are loopback-only by design.
 """
 import json
 from urllib.parse import urlparse
-from urllib.request import Request,urlopen
+from urllib.request import Request,build_opener,HTTPRedirectHandler
 from .renderer import DecisionBrief
+
+class _NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self,req,fp,code,msg,headers,newurl):
+        return None
 
 def _loopback(url):
     p=urlparse(url)
@@ -41,7 +45,7 @@ def _request(endpoint,payload,transport,timeout):
         data=json.dumps(payload,ensure_ascii=False).encode("utf-8")
         req=Request(endpoint,data=data,
                     headers={"Content-Type":"application/json"},method="POST")
-        with urlopen(req,timeout=timeout) as stream:
+        with build_opener(_NoRedirect).open(req,timeout=timeout) as stream:
             response=json.loads(stream.read(2_000_000).decode("utf-8"))
     if not isinstance(response,dict):
         raise ValueError("invalid renderer response")
