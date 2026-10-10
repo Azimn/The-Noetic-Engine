@@ -9,7 +9,8 @@ def install(store):
       id INTEGER PRIMARY KEY, origin TEXT NOT NULL,
       attributed_actor TEXT NOT NULL, believed_subject TEXT NOT NULL,
       predicate TEXT NOT NULL, valence REAL NOT NULL, confidence REAL NOT NULL,
-      epistemic TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'unreviewed',
+      epistemic TEXT NOT NULL, quotation TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'unreviewed',
       FOREIGN KEY(origin) REFERENCES observations(origin));
     CREATE TABLE IF NOT EXISTS social_reviews(
       id INTEGER PRIMARY KEY, claim_id INTEGER NOT NULL, reviewer TEXT NOT NULL,
@@ -53,9 +54,13 @@ def install(store):
     """)
     with store.tx():
         version=store.meta("noetic_extension_schema")
-        if version not in (None,"1","2","3"):
+        if version not in (None,"1","2","3","4"):
             raise ValueError("incompatible Noetic extension schema")
-        store.put("noetic_extension_schema","3")
+        # Additive migration for any prior v0.2 branch database.
+        existing={r[1] for r in store.db.execute("PRAGMA table_info(social_claims)")}
+        if "quotation" not in existing:
+            store.db.execute("ALTER TABLE social_claims ADD COLUMN quotation TEXT NOT NULL DEFAULT ''")
+        store.put("noetic_extension_schema","4")
         for name in ("inquiry","care","caution"):
             store.db.execute("""INSERT OR IGNORE INTO developmental_state
               VALUES(?,0,0,0,0)""",(name,))
