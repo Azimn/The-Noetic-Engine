@@ -7,6 +7,7 @@ from .egregore import record_claim, review_claim
 from .selfmodel import propose as propose_self, review as review_self
 from .oracle_guard import review as review_oracle_record
 from .development import consolidate, lesion_signature
+from .neural_field import initialize as neural_initialize, load as neural_load, reinforce as neural_reinforce
 from .store import Store
 from .step import perform
 from .operations import intention,finish_intention,bind_symbol,outcome
@@ -24,6 +25,10 @@ class NoeticEngine:
             raise ValueError("configuration digest mismatch; clone state for experimental ablation")
         if existing is None:
             with self.store.tx():self.store.put("config_digest",expected)
+        if self.config.neural_field:
+            with self.store.tx():
+                neural_initialize(self.store.db,self.config.subject_id,
+                                  self.config.neural_units,self.config.neural_seed)
         policy=self.store.meta("policy")
         if policy not in (None,self.config.policy_version):
             raise ValueError("policy version mismatch")
@@ -64,6 +69,10 @@ class NoeticEngine:
                 changed=consolidate(self.store.db,row["action"],reward,decision_id,authority)
                 self.store.event(int(self.store.meta("tick")),"developmental_consolidation",
                                  {**changed,"source_origin":source_origin})
+            if self.config.neural_field:
+                changed_neural=neural_reinforce(self.store.db,self.config.subject_id,reward)
+                self.store.event(int(self.store.meta("tick")),"neural_reinforcement",
+                                 {"decision_id":decision_id,**changed_neural})
             self.store.event(int(self.store.meta("tick")),"outcome_authority",
                              {"decision_id":decision_id,"authority":authority,
                               "source_origin":source_origin})
@@ -110,6 +119,10 @@ class NoeticEngine:
           "social_claims":[dict(r) for r in db.db.execute("SELECT * FROM social_claims ORDER BY id")],
           "oracle_reviews":[dict(r) for r in db.db.execute("SELECT * FROM oracle_reviews ORDER BY id")],
           "configuration_digest":db.meta("config_digest"),
+          "neural_field":({"units":self.config.neural_units,
+                           "updates":neural_load(db.db,self.config.subject_id)["updates"],
+                           "outcomes":neural_load(db.db,self.config.subject_id)["outcomes"]}
+                           if self.config.neural_field else None),
           "self_hypotheses":[dict(r) for r in db.db.execute("SELECT * FROM self_hypotheses ORDER BY id")]
         }
 
