@@ -67,7 +67,14 @@ class Store:
                 "development":json.loads(r["template_json"])})==r["digest"]
                 for r in self.db.execute(
                     "SELECT values_json,template_json,digest FROM field_snapshots"))
-            return recurrent and developmental
+            decisions=all(digest({
+                "selected":r["action"],"features":json.loads(r["feature_json"]),
+                "source_origin":r["origin"],"by_action":json.loads(r["score_json"]),
+                "version":"signed-quadratic-v01"})==r["digest"]
+                for r in self.db.execute("SELECT * FROM choice_decisions"))
+            feedback=all(digest(json.loads(r["update_json"]))==r["digest"]
+                for r in self.db.execute("SELECT * FROM choice_feedback"))
+            return recurrent and developmental and decisions and feedback
         except (sqlite3.Error,ValueError,TypeError,KeyError):
             return False
     def close(self):self.db.close()
