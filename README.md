@@ -4,11 +4,11 @@
 
 A speculative but falsifiable research architecture for the persistent character Doctor Septimus Pretorius. Esoteric vocabulary motivates design possibilities; it is **not evidence of occult physics, simulation theory, machine consciousness, or successful identity persistence**.
 
-## Status (2026-10-09)
+## Status (2026-10-09): v0.2 integration candidate
 
-Research design v0.1 and integrated engineering foundation in progress. No performance claims or completed efficacy experiments. This is **not** the definitive Pretorius production brain, which remains [The-Doctor-Lives](https://github.com/Azimn/The-Doctor-Lives). Experimental promotion requires an independent evidence gate.
+The v0.2 review branch contains the complete reference architecture and an integrated, runnable research profile. It is NOT a completed empirical validation or a production Pretorius upgrade. No character-continuity efficacy claims have been established. This is **not** the definitive Pretorius production brain, which remains [The-Doctor-Lives](https://github.com/Azimn/The-Doctor-Lives). Experimental promotion requires an independent evidence gate.
 
-Read [architecture design](docs/ARCHITECTURE_V1.md), [academic manuscript](paper/NOETIC_FIELD_PAPER_V1.md), [build roadmap](docs/BUILD_PLAN.md), [evidence and falsification contract](docs/EVIDENCE_CONTRACT.md), and [integration boundaries](docs/INTEGRATION_CONTRACT.md).
+Read [architecture v0.2](docs/ARCHITECTURE_V2.md), [paper v0.2](paper/NOETIC_FIELD_PAPER_V2.md), [research handoff](docs/RESEARCH_STATUS_V02.md), [production adapter RFC](docs/NOETIC_BRAIN_ADAPTER_RFC.md), [emic/etic rules](docs/EMIC_ETIC_TERMINOLOGY.md), [full build roadmap](docs/BUILD_PLAN.md), and [evidence contract](docs/EVIDENCE_CONTRACT.md). The original v0.1 documents remain preserved.
 
 ## Concept
 
@@ -26,13 +26,15 @@ A durable cognitive state is updated through interacting memory evidence, modele
 
 ## Development
 
-The build is phased by complete **vertical integration**, not disposable micro-prototypes. Phase I targets a deterministic runnable cognitive cycle with durable state, competing objectives, relationships, evidence, constrained imagination, auditable policy and tests. Later phases add learned regulation, scale, adapters, and controlled renderer/model swaps.
+The build is phased by complete **vertical integration**, not disposable micro-prototypes. The integrated reference profile includes transactional evidence, source-reviewed social attribution, fallible self-model, isolated counterfactuals, bounded developmental feedback, optional synthetic recurrent learning, endogenous wake/sleep-like cycles, deterministic event replay, backup/restore, read-only decision briefs, and a separate fictional world. Real model-family adapters, independently established semantic recall, neurobiological fidelity, and longitudinal identity benefit remain unvalidated. The proposed adapter to The-Doctor-Lives is RFC-only.
 
 Run with Python 3.11+ and standard library only:
 
 ```sh
 python -m unittest discover -s tests -v
-python -m noetic_engine --db noetic.db demo
+python -m noetic_engine --db baseline.db demo
+python -m noetic_engine --profile full --db full.db demo
+python -m noetic_engine --profile full --db full.db pulse --mode sleep --seed 7
 ```
 
 Development deliberately begins with explicit inspectable operators. Later neural or field implementations must demonstrate causal improvement against these baselines.
